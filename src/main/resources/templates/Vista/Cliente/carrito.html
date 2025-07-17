@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Carrito</title>
+    <script src="https://kit.fontawesome.com/eb344c5846.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../../Vista/Estilos/EstiloNavbar.css" />
+    <link rel="stylesheet" href="../../Vista/Estilos/Carrito.css" />
+    
+</head>
+
+<body>
+    <nav>
+        
+        <input type="checkbox" id="check" />
+        
+        <label for="check" class="checkbtn">
+            <i class="fas fa-bars"></i>
+        </label>
+        
+        <a href="../inicio.html" class="enlace">
+            <img src="../../Vista/Imagenes/img-inicio/LOGO.jpeg" alt="" class="logo" />
+        </a>
+
+        
+        <ul>
+            <li><a href="../inicio.html">Inicio</a></li>
+            <li><a href="sobrenosotros.html">Sobre Nosotros</a></li>
+            <li><a href="carta.html">Carta</a></li>
+            <li><a href="login.html">Iniciar Sesión</a></li>
+            <li><a href="carrito.html" id="cart"><img src="../../Vista/Imagenes/img-carta/shopping-cart.png" alt=""><span id="cuenta-carrito">0</span></a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Título centrado sobre el contenido del carrito -->
+        <h1 id="titulo-carrito">Carrito</h1>
+
+        <section id="carrito-contenido">
+            <!-- Productos cargados dinámicamente -->
+        </section>
+
+        <div id="carrito-resumen" style="display: none">
+            <p>Total unidades: <span id="total-unidades">0</span></p>
+            <p>Total precio: S/<span id="total-precio">0.00</span></p>
+            <button id="comprar-btn">Comprar</button>
+            <button id="reiniciar-btn">Reiniciar</button>
+        </div>
+        <!-- Modal de confirmación -->
+        <!-- Modal de pago -->
+        <div id="modal-pago" class="modal">
+            <div class="modal-contenido">
+                <span id="cerrar-modal" class="close">&times;</span>
+                <!-- Formulario de facturación y pago -->
+                <div class="container">
+                    <form action="" id="formulario-pago">
+                        <div class="row">
+                            <div class="column">
+                                <h3 class="title">DIRECCIÓN DE FACTURACIÓN</h3>
+                                <div class="input-box">
+                                    <span>Nombre completo :</span>
+                                    <input type="text" id="nombre" placeholder="Nombres" required />
+                                </div>
+                                <div class="input-box">
+                                    <span>Correo electrónico :</span>
+                                    <input type="email" id="email" placeholder="ejemplo@gmail.com" required />
+                                </div>
+                                <div class="input-box">
+                                    <span>Dirección :</span>
+                                    <input type="text" id="direccion" placeholder="Distrito - Calle" required />
+                                </div>
+                                <div class="input-box">
+                                    <span>Ciudad :</span>
+                                    <input type="text" id="ciudad" placeholder="Ciudad" required />
+                                </div>
+                                <div class="flex">
+                                    <div class="input-box">
+                                        <span>País :</span>
+                                        <input type="text" id="pais" placeholder="País" required />
+                                    </div>
+                                    <div class="input-box">
+                                        <span>Código postal :</span>
+                                        <input type="number" id="codigo-postal" placeholder="123 456" required />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="column">
+                                <h3 class="title">PAGO</h3>
+                                <div class="input-box">
+                                    <span>Tarjetas aceptadas :</span>
+                                    <img src="../../Vista/Imagenes/img-pago/imgcards.png" alt="" />
+                                </div>
+                                <div class="input-box">
+                                    <span>Nombre en la tarjeta :</span>
+                                    <input type="text" id="nombre-tarjeta" placeholder="Nombres" required />
+                                </div>
+                                <div class="input-box">
+                                    <span>Número de tarjeta :</span>
+                                    <input type="number" id="numero-tarjeta" placeholder="0000 0000 0000 0000" required
+                                        pattern="\d{16}" title="El número de tarjeta debe tener 16 dígitos" />
+                                </div>
+                                <div class="input-box">
+                                    <label for="fecha-expiracion">Fecha de expiración:</label>
+                                    <input type="date" id="fecha-expiracion" name="fecha-expiracion" required />
+
+                                    <div class="input-box">
+                                        <span>CVV :</span>
+                                        <input type="number" id="cvv" placeholder="123" required pattern="\d{3}"
+                                            title="El CVV debe tener 3 dígitos" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn" id="finalizar-pago-btn">
+                            Pagar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer style="background-color: #5c5858; color: white; text-align: center; padding: 10px 0; margin-top: 900px">
+      <p>&copy; 2024 Lora Café. Todos los derechos reservados.</p>
+      <p>Síguenos en redes sociales: </p>
+      <i class="fa-brands fa-facebook" style= "color: rgb(255, 255, 255); font-size: 24px; margin-right: 15px;"></i>
+    </a> 
+      <a href="https://www.instagram.com/loracafe.ica?igsh=bGkwN3locXhpMWZw">
+        <i class="fa-brands fa-instagram" style="color: rgb(255, 255, 255);font-size: 24px; margin-right: 15px;"></i>
+      </a>
+      <a href="https://l.instagram.com/?u=https%3A%2F%2Fwa.link%2Foomk5g&e=AT10FzF9cbchi_VQ_RF7ArFOdT0GMtS-p4ovBUU8RL1OLmGIzX-8jLJnzfEH_z3D9GC9MBHTIEbFcJWP8pqWQrphw4wdhbWM_XxHnw">
+        <i class="fa-brands fa-whatsapp" style="color: rgb(255, 255, 255);font-size: 24px; margin-right: 15px;"></i>
+      </a>
+              
+  </footer>
+    
+    <script src="../../Controlador/JavaScript/Carta.js"></script>
+    <script src="../../Controlador/JavaScript/Carrito.js"></script>
+    <script src="../../Controlador/JavaScript/Navbar.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://kit.fontawesome.com/eb344c5846.js" crossorigin="anonymous"></script>
+    
+    
+    <link rel="stylesheet" href="../../Vista/Estilos/EstiloLogin.css">
+    <link rel="stylesheet" href="../../Vista/Estilos/EstiloNavbar.css" />
+    
+</head>
+<body>
+    <nav>
+        
+        <input type="checkbox" id="check">
+        
+        <label for="check" class="checkbtn">
+          <i class="fas fa-bars"></i>
+        </label>
+        
+        <a href="../inicio.html" class="enlace">
+            <img src="../../Vista/Imagenes/img-inicio/LOGO.jpeg" alt="" class="logo">
+        </a>
+        
+        
+        <ul>
+            <li><a href="../inicio.html">Inicio</a></li>
+            <li><a href="sobrenosotros.html">Sobre Nosotros</a></li>
+            <li><a href="carta.html">Carta</a></li>
+            <li><a href="login.html">Iniciar Sesión</a></li>
+            <li><a href="carrito.html" id="cart"><img src="../../Vista/Imagenes/img-carta/shopping-cart.png" alt=""><span id="cuenta-carrito">0</span></a></li>
+        </ul>
+      </nav>
+      <section class="login-section">
+    <div class="contenedor">
+        <div class="form-box login">
+            <form action="">
+                <h1>Iniciar sesión</h1>
+                <div class="input-box">
+                    <input type="text" placeholder="Nombre de usuario" required>
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="input-box">
+                    <input type="password" placeholder="Contraseña" required>
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <div class="forgot-link">
+                    <a href="#">¿Has olvidado la contraseña?</a>
+                </div>
+                <button type="submit" class="btn">Iniciar sesión</button>
+                <p>O registrarse con</p>
+                <div class="social-icons">
+                    <a href="#" ><i class="fa-brands fa-google"></i></a>
+                    <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#"><i class="fa-brands fa-apple"></i></a>
+                </div>
+            </form>
+        </div>
+
+
+        <div class="form-box register">
+            <form action="">
+                <h1>Regístrate</h1>
+                <div class="input-box">
+                    <input type="text" placeholder="Nombre de usuario" required>
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="input-box">
+                    <input type="email" placeholder="Correo electrónico" required>
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+                <div class="input-box">
+                    <input type="password" placeholder="Contraseña" required>
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                
+                <button type="submit" class="btn">Registrarse</button>
+                <p>O iniciar sesión con</p>
+                <div class="social-icons">
+                    <a href="#" ><i class="fa-brands fa-google"></i></a>
+                    <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#"><i class="fa-brands fa-apple"></i></a>
+                </div>
+            </form>
+        </div>
+        <div class="toggle-box">
+            <div class="toggle-panel toggle-left">
+                <h1>¡Hola, bienvenido!</h1>
+                <p>¿No tienes una cuenta?</p>
+                <button class="btn register-btn">Registrarse</button>
+            </div>
+            <div class="toggle-panel toggle-right">
+                <h1>¡Bienvenido de nuevo!</h1>
+                <p>¿Ya tienes una cuenta?</p>
+                <button class="btn login-btn">Iniciar sesión</button>
+            </div>
+        </div>
+        
+    </div>  
+</section>  
+<footer style="background-color: #5c5858; color: white; text-align: center; padding: 10px 0;">
+  <p>&copy; 2024 Lora Café. Todos los derechos reservados.</p>
+  <p>Síguenos en redes sociales: </p>
+  <a href="https://www.facebook.com/share/ctLabiRs8VnH2tCH/?mibextid=qi20mg" >
+  <i class="fa-brands fa-facebook" style= "color: rgb(255, 255, 255); font-size: 24px; margin-right: 15px;"></i>
+  </a> 
+  <a href="https://www.instagram.com/loracafe.ica?igsh=bGkwN3locXhpMWZw">
+  <i class="fa-brands fa-instagram" style="color: rgb(255, 255, 255);font-size: 24px; margin-right: 15px;"></i>
+  </a>
+  
+  <a href="https://l.instagram.com/?u=https%3A%2F%2Fwa.link%2Foomk5g&e=AT10FzF9cbchi_VQ_RF7ArFOdT0GMtS-p4ovBUU8RL1OLmGIzX-8jLJnzfEH_z3D9GC9MBHTIEbFcJWP8pqWQrphw4wdhbWM_XxHnw">
+      <i class="fa-brands fa-whatsapp" style="color: rgb(255, 255, 255);font-size: 24px; margin-right: 15px;"></i>
+  </a>
+          
+</footer>
+
+<script src="../../Controlador/JavaScript/login.js"></script>
+<script src="../../Controlador/JavaScript/Navbar.js"></script>
+</body>
+</html>
