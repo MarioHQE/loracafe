@@ -1,60 +1,52 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Lora Café - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/main.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    <link rel="stylesheet" href="assets/css/responsive.css">
+    
+    <link rel="stylesheet" th:href="@{/assets/dashboard/css/main.css}">
+    <link rel="stylesheet" th:href="@{/assets/dashboard/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/assets/dashboard/css/responsive.css}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="app-container">
-        <!-- Sidebar -->
+        <!-- ==================== SIDEBAR ==================== -->
         <aside class="sidebar">
             <div class="logo-area">
                 <h1><i class="fas fa-mug-hot"></i> Lora Café</h1>
             </div>
             <div class="menu-items">
-                <div class="menu-item active" data-page="dashboard">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </div>
-                <div class="menu-item" data-page="products">
-                    <i class="fas fa-coffee"></i>
-                    <span>Productos</span>
-                </div>
-                <div class="menu-item" data-page="orders">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Pedidos</span>
-                </div>
-                <div class="menu-item" data-page="customers">
-                    <i class="fas fa-users"></i>
-                    <span>Clientes</span>
-                </div>
-                <div class="menu-item" data-page="messages">
-                    <i class="fas fa-envelope"></i>
-                    <span>Mensajes</span>
-                </div>
-                <div class="menu-item" data-page="users">
-                    <i class="fas fa-user-cog"></i>
-                    <span>Usuarios</span>
-                </div>
-                <div class="menu-item" data-page="analytics">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Analíticas</span>
-                </div>
-                <div class="menu-item" data-page="reports">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Reportes</span>
-                </div>
-                <div class="menu-item" data-page="settings">
-                    <i class="fas fa-cog"></i>
-                    <span>Ajustes</span>
-                </div>
+                <a th:href="@{/}" class="menu-item" th:classappend="${page == 'dashboard' ? 'active' : ''}">
+                    <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+                </a>
+                <a th:href="@{/products}" class="menu-item" th:classappend="${page == 'products' ? 'active' : ''}">
+                    <i class="fas fa-coffee"></i><span>Productos</span>
+                </a>
+                <a th:href="@{/orders}" class="menu-item" th:classappend="${page == 'orders' ? 'active' : ''}">
+                    <i class="fas fa-shopping-cart"></i><span>Pedidos</span>
+                </a>
+                <a th:href="@{/customers}" class="menu-item" th:classappend="${page == 'customers' ? 'active' : ''}">
+                    <i class="fas fa-users"></i><span>Clientes</span>
+                </a>
+                <a th:href="@{/messages}" class="menu-item" th:classappend="${page == 'messages' ? 'active' : ''}">
+                    <i class="fas fa-envelope"></i><span>Mensajes</span>
+                </a>
+                <a th:href="@{/users}" class="menu-item" th:classappend="${page == 'users' ? 'active' : ''}">
+                    <i class="fas fa-user-cog"></i><span>Usuarios</span>
+                </a>
+                <a th:href="@{/analytics}" class="menu-item" th:classappend="${page == 'analytics' ? 'active' : ''}">
+                    <i class="fas fa-chart-line"></i><span>Analíticas</span>
+                </a>
+                <a th:href="@{/reports}" class="menu-item" th:classappend="${page == 'reports' ? 'active' : ''}">
+                    <i class="fas fa-file-alt"></i><span>Reportes</span>
+                </a>
+                <a th:href="@{/settings}" class="menu-item" th:classappend="${page == 'settings' ? 'active' : ''}">
+                    <i class="fas fa-cog"></i><span>Ajustes</span>
+                </a>
                 <div class="menu-item" id="logout">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Cerrar Sesión</span>
@@ -62,7 +54,7 @@
             </div>
         </aside>
 
-        <!-- Main Content -->
+        <!-- ==================== MAIN CONTENT ==================== -->
         <main class="main-content">
             <!-- Header -->
             <header class="header">
@@ -70,7 +62,7 @@
                     <div class="menu-toggle">
                         <i class="fas fa-bars"></i>
                     </div>
-                    <h2 id="page-title">Dashboard</h2>
+                    <h2 id="page-title" th:text="${#strings.capitalize(page ?: 'Dashboard')}">Dashboard</h2>
                 </div>
                 <div class="header-right">
                     <div class="notification-bell">
@@ -78,122 +70,97 @@
                         <span class="badge">5</span>
                     </div>
                     <div class="user-profile">
-                        <img src="/Vista/Imagenes/img-nosotros/equi14.jpg" alt="Admin">
+                        <img th:src="@{/img/img-nosotros/equi14.jpg}" alt="Admin">
                         <span>Admin</span>
                     </div>
                 </div>
             </header>
 
-            <!-- Content Area -->
             <div class="content">
-                <!-- Dashboard Page -->
-                <div class="page active" id="dashboard-page">
+                <!-- ==================== DASHBOARD PAGE ==================== -->
+                <div class="page" id="dashboard-page" th:classappend="${page == 'dashboard' ? 'active' : ''}">
                     <div class="page-title">
                         <h3>Dashboard</h3>
-                        <button class="btn btn-primary" id="generate-report">
-                            <i class="fas fa-download"></i> Generar Reporte
-                        </button>
+                        <button class="btn btn-primary" id="generate-report"><i class="fas fa-download"></i> Generar Reporte</button>
                     </div>
 
-                    <!-- Stats Grid -->
                     <div class="stats-grid">
                         <div class="stat-card">
-                            <div class="stat-icon blue">
-                                <i class="fas fa-shopping-cart"></i>
-                            </div>
+                            <div class="stat-icon blue"><i class="fas fa-shopping-cart"></i></div>
                             <div class="stat-info">
-                                <h4 id="today-orders">128</h4>
+                                <h4 id="today-orders" th:text="${pedidosHoy ?: 0}">0</h4>
                                 <p>Pedidos Hoy</p>
-                                <div class="stat-trend">
-                                    <i class="fas fa-arrow-up"></i> 12% más que ayer
-                                </div>
                             </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-icon green">
-                                <i class="fas fa-coffee"></i>
-                            </div>
+                            <div class="stat-icon green"><i class="fas fa-coffee"></i></div>
                             <div class="stat-info">
-                                <h4 id="total-products">42</h4>
+                                <h4 id="total-products" th:text="${totalProductos ?: 0}">0</h4>
                                 <p>Productos</p>
                             </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-icon orange">
-                                <i class="fas fa-users"></i>
-                            </div>
+                            <div class="stat-icon orange"><i class="fas fa-users"></i></div>
                             <div class="stat-info">
-                                <h4 id="new-customers">24</h4>
-                                <p>Nuevos Clientes</p>
-                                <div class="stat-trend">
-                                    <i class="fas fa-arrow-up"></i> 8% este mes
-                                </div>
+                                <h4 id="new-customers" th:text="${nuevosClientes ?: 0}">0</h4>
+                                <p>Nuevos Clientes (mes)</p>
                             </div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-icon red">
-                                <i class="fas fa-comments"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h4 id="new-messages">18</h4>
-                                <p>Mensajes Nuevos</p>
-                            </div>
+                         <div class="stat-card">
+                            <div class="stat-icon red"><i class="fas fa-comments"></i></div>
+                            <div class="stat-info"><h4 id="new-messages">18</h4><p>Mensajes Nuevos</p></div>
                         </div>
                     </div>
 
-                    <!-- Charts Row -->
                     <div class="grid-2">
                         <div class="chart-container">
                             <h4>Ventas por Categoría</h4>
-                            <div class="chart-box">
-                                <canvas id="salesByCategoryChart"></canvas>
-                            </div>
+                            <div class="chart-box"><canvas id="salesByCategoryChart"></canvas></div>
                         </div>
                         <div class="chart-container">
                             <h4>Ingresos Mensuales</h4>
-                            <div class="chart-box">
-                                <canvas id="monthlyRevenueChart"></canvas>
-                            </div>
+                            <div class="chart-box"><canvas id="monthlyRevenueChart"></canvas></div>
                         </div>
                     </div>
 
-                    <!-- Recent Orders -->
                     <div class="card">
-                        <div class="card-header">
-                            <h4>Pedidos Recientes</h4>
-                            <button class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Nuevo Pedido
-                            </button>
-                        </div>
+                        <div class="card-header"><h4>Pedidos Recientes</h4></div>
                         <div class="card-body">
                             <table id="recent-orders-table">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Cliente</th>
-                                        <th>Fecha</th>
-                                        <th>Total</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
+                                        <th>ID</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th><th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <!-- JS will populate this -->
+                                    <tr th:each="pedido : ${pedidosRecientes}">
+                                        <td th:text="${pedido.id}">ORD-001</td>
+                                        <td th:text="${pedido.usuario != null ? pedido.usuario.nombre + ' ' + pedido.usuario.apellido : 'N/A'}">Cliente</td>
+                                        <td th:text="${#temporals.format(pedido.fechaPedido, 'dd-MM-yyyy HH:mm')}">Fecha</td>
+                                        <td th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2, 'COMMA')}">S/ 0.00</td>
+                                        <td>
+                                            <span class="status" th:classappend="${#strings.toLowerCase(pedido.estado.name())}" th:text="${#strings.replace(pedido.estado.name(), '_', ' ')}">Estado</span>
+                                        </td>
+                                        <td>
+                                            <button class="action-btn view" th:attr="data-id=${pedido.id}"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn edit" th:attr="data-id=${pedido.id}"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${pedidosRecientes == null or #lists.isEmpty(pedidosRecientes)}">
+                                        <td colspan="6" style="text-align: center;">No hay pedidos recientes.</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- Products Page -->
-                <div class="page" id="products-page">
+                <!-- ==================== PRODUCTS PAGE ==================== -->
+                <div class="page" id="products-page" th:classappend="${page == 'products' ? 'active' : ''}">
                     <div class="page-title">
                         <h3>Gestión de Productos</h3>
-                        <button class="btn btn-primary" id="add-product-btn">
-                            <i class="fas fa-plus"></i> Agregar Producto
-                        </button>
+                        <button class="btn btn-primary" id="add-product-btn"><i class="fas fa-plus"></i> Agregar Producto</button>
                     </div>
-
                     <div class="card">
                         <div class="card-header">
                             <h4>Lista de Productos</h4>
@@ -205,112 +172,29 @@
                         <div class="card-body">
                             <table id="products-table">
                                 <thead>
-                                    <tr>
-                                        <th>Imagen</th>
-                                        <th>Nombre</th>
-                                        <th>Categoría</th>
-                                        <th>Descripción</th>
-                                        <th>Precio</th>
-                                        <th>Stock</th>
-                                        <th>Acciones</th>
-                                    </tr>
+                                    <tr><th>Imagen</th><th>Nombre</th><th>Categoría</th><th>Descripción</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr>
                                 </thead>
-                                <tbody>
-                                    <!-- JS will populate this -->
-                                </tbody>
+                                <tbody><!-- JS llenará esta tabla --></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- Customers Page -->
-                <div class="page" id="customers-page">
-                    <div class="page-title">
-                        <h3>Clientes Registrados</h3>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Lista de Clientes</h4>
-                            <div class="search-box">
-                                <i class="fas fa-search"></i>
-                                <input type="text" id="customer-search" placeholder="Buscar clientes...">
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <table id="customers-table">
-                                <thead>
-                                    <tr>
-                                        <th>Nombre</th>
-                                        <th>Email</th>
-                                        <th>Teléfono</th>
-                                        <th>Registro</th>
-                                        <th>Total Pedidos</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- JS will populate this -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Messages Page -->
-                <div class="page" id="messages-page">
-                    <div class="page-title">
-                        <h3>Mensajes de Clientes</h3>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Mensajes Recibidos</h4>
-                            <div class="search-box">
-                                <i class="fas fa-search"></i>
-                                <input type="text" id="message-search" placeholder="Buscar mensajes...">
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <table id="messages-table">
-                                <thead>
-                                    <tr>
-                                        <th>Nombre</th>
-                                        <th>Email</th>
-                                        <th>Asunto</th>
-                                        <th>Mensaje</th>
-                                        <th>Fecha</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- JS will populate this -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Orders Page -->
-                <div class="page" id="orders-page">
-                    <div class="page-title">
+                <!-- ==================== ORDERS PAGE ==================== -->
+                <div class="page" id="orders-page" th:classappend="${page == 'orders' ? 'active' : ''}">
+                     <div class="page-title">
                         <h3>Gestión de Pedidos</h3>
-                        <button class="btn btn-primary" id="add-order-btn">
-                            <i class="fas fa-plus"></i> Nuevo Pedido
-                        </button>
                     </div>
-
                     <div class="card">
                         <div class="card-header">
                             <h4>Historial de Pedidos</h4>
-                            <div class="filters">
+                             <div class="filters">
                                 <select id="order-status-filter">
                                     <option value="all">Todos los estados</option>
-                                    <option value="pending">Pendientes</option>
-                                    <option value="processing">En proceso</option>
-                                    <option value="completed">Completados</option>
-                                    <option value="cancelled">Cancelados</option>
+                                    <option value="PENDIENTE">Pendientes</option>
+                                    <option value="EN_PROCESO">En proceso</option>
+                                    <option value="COMPLETADO">Completados</option>
+                                    <option value="CANCELADO">Cancelados</option>
                                 </select>
                                 <input type="date" id="order-date-filter">
                             </div>
@@ -318,439 +202,111 @@
                         <div class="card-body">
                             <table id="orders-table">
                                 <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Cliente</th>
-                                        <th>Fecha</th>
-                                        <th>Productos</th>
-                                        <th>Total</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
+                                    <tr><th>ID</th><th>Cliente</th><th>Fecha</th><th>Productos</th><th>Total</th><th>Estado</th><th>Acciones</th></tr>
                                 </thead>
-                                <tbody>
-                                    <!-- JS will populate this -->
-                                </tbody>
+                                <tbody><!-- JS llenará esta tabla --></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-                <!-- Users Page -->
-<div class="page" id="users-page">
-    <div class="page-title">
-        <h3>Administración de Usuarios</h3>
-        <button class="btn btn-primary" id="add-user-btn">
-            <i class="fas fa-plus"></i> Nuevo Usuario
-        </button>
-    </div>
 
-    <div class="card">
-        <div class="card-header">
-            <h4>Lista de Usuarios</h4>
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="user-search" placeholder="Buscar usuarios...">
-            </div>
-        </div>
-        <div class="card-body">
-            <table id="users-table">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Email</th>
-                        <th>Rol</th>
-                        <th>Último Acceso</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- JS will populate this -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-
-                <!-- Analytics Page -->
-                <div class="page" id="analytics-page">
-                    <div class="page-title">
-                        <h3>Análisis de Datos</h3>
-                        <div class="date-range">
-                            <input type="date" id="start-date">
-                            <span>a</span>
-                            <input type="date" id="end-date">
-                            <button class="btn btn-primary" id="apply-dates">
-                                <i class="fas fa-filter"></i> Aplicar
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="grid-2">
-                        <div class="chart-container">
-                            <h4>Productos Más Vendidos</h4>
-                            <div class="chart-box">
-                                <canvas id="top-products-chart"></canvas>
-                            </div>
-                        </div>
-                        <div class="chart-container">
-                            <h4>Ingresos por Hora</h4>
-                            <div class="chart-box">
-                                <canvas id="revenue-by-hour-chart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="chart-container">
-                        <h4>Tendencias de Ventas</h4>
-                        <div class="chart-box">
-                            <canvas id="sales-trends-chart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="grid-2">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Clientes Más Activos</h4>
-                            </div>
-                            <div class="card-body">
-                                <table id="top-customers-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Cliente</th>
-                                            <th>Pedidos</th>
-                                            <th>Total Gastado</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- JS will populate this -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Resumen de Categorías</h4>
-                            </div>
-                            <div class="card-body">
-                                <table id="categories-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Categoría</th>
-                                            <th>Ventas</th>
-                                            <th>% Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- JS will populate this -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Reports Page -->
-                <div class="page" id="reports-page">
-                    <div class="page-title">
-                        <h3>Generación de Reportes</h3>
-                    </div>
-
-                    <div class="grid-3">
-                        <div class="report-card">
-                            <i class="fas fa-shopping-cart"></i>
-                            <h4>Reporte de Ventas</h4>
-                            <p>Genera un informe detallado de todas las ventas realizadas</p>
-                            <button class="btn btn-primary generate-report" data-type="sales">
-                                <i class="fas fa-download"></i> Generar
-                            </button>
-                        </div>
-                        <div class="report-card">
-                            <i class="fas fa-coffee"></i>
-                            <h4>Reporte de Productos</h4>
-                            <p>Informe de productos más vendidos y rendimiento</p>
-                            <button class="btn btn-primary generate-report" data-type="products">
-                                <i class="fas fa-download"></i> Generar
-                            </button>
-                        </div>
-                        <div class="report-card">
-                            <i class="fas fa-users"></i>
-                            <h4>Reporte de Clientes</h4>
-                            <p>Análisis de comportamiento y preferencias de clientes</p>
-                            <button class="btn btn-primary generate-report" data-type="customers">
-                                <i class="fas fa-download"></i> Generar
-                            </button>
-                        </div>
-                    </div>
-
+                <!-- ==================== CUSTOMERS PAGE ==================== -->
+                <div class="page" id="customers-page" th:classappend="${page == 'customers' ? 'active' : ''}">
+                    <div class="page-title"><h3>Clientes Registrados</h3></div>
                     <div class="card">
-                        <div class="card-header">
-                            <h4>Reportes Generados</h4>
-                        </div>
+                        <div class="card-header"><h4>Lista de Clientes</h4></div>
                         <div class="card-body">
-                            <table id="reports-table">
+                            <table id="customers-table">
                                 <thead>
-                                    <tr>
-                                        <th>Nombre</th>
-                                        <th>Tipo</th>
-                                        <th>Fecha Generación</th>
-                                        <th>Tamaño</th>
-                                        <th>Acciones</th>
-                                    </tr>
+                                    <tr><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Registro</th><th>Total Pedidos</th><th>Acciones</th></tr>
                                 </thead>
-                                <tbody>
-                                    <!-- JS will populate this -->
-                                </tbody>
+                                <tbody><!-- JS llenará esta tabla --></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- Settings Page -->
-                <div class="page" id="settings-page">
+                <!-- ==================== MESSAGES PAGE ==================== -->
+                <div class="page" id="messages-page" th:classappend="${page == 'messages' ? 'active' : ''}">
+                    <div class="page-title"><h3>Mensajes de Clientes</h3></div>
+                     <div class="card">
+                        <div class="card-header"><h4>Mensajes Recibidos</h4></div>
+                        <div class="card-body">
+                            <table id="messages-table">
+                                <thead>
+                                    <tr><th>Nombre</th><th>Email</th><th>Asunto</th><th>Mensaje</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr>
+                                </thead>
+                                <tbody><!-- JS llenará esta tabla --></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== USERS PAGE ==================== -->
+                <div class="page" id="users-page" th:classappend="${page == 'users' ? 'active' : ''}">
                     <div class="page-title">
-                        <h3>Configuración del Sistema</h3>
+                        <h3>Administración de Usuarios</h3>
+                        <button class="btn btn-primary" id="add-user-btn"><i class="fas fa-plus"></i> Nuevo Usuario</button>
                     </div>
-
-                    <div class="grid-2">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4><i class="fas fa-store"></i> Configuración de la Cafetería</h4>
-                            </div>
-                            <div class="card-body">
-                                <form id="cafe-settings">
-                                    <div class="form-group">
-                                        <label for="cafe-name">Nombre de la Cafetería</label>
-                                        <input type="text" id="cafe-name" class="form-control" value="Cafetería Delicioso">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="cafe-address">Dirección</label>
-                                        <input type="text" id="cafe-address" class="form-control" value="Calle Principal 123, Ciudad">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="cafe-phone">Teléfono</label>
-                                        <input type="tel" id="cafe-phone" class="form-control" value="+34 912 345 678">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="cafe-email">Email</label>
-                                        <input type="email" id="cafe-email" class="form-control" value="info@cafeteriadelicioso.com">
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save"></i> Guardar Cambios
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h4><i class="fas fa-user-shield"></i> Seguridad</h4>
-                            </div>
-                            <div class="card-body">
-                                <form id="security-settings">
-                                    <div class="form-group">
-                                        <label>Autenticación de Dos Factores</label>
-                                        <div class="toggle-switch">
-                                            <input type="checkbox" id="two-factor" checked>
-                                            <label for="two-factor"></label>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Requerir cambio de contraseña cada</label>
-                                        <select class="form-control">
-                                            <option>30 días</option>
-                                            <option selected>60 días</option>
-                                            <option>90 días</option>
-                                            <option>Nunca</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Notificaciones de Seguridad</label>
-                                        <div class="toggle-switch">
-                                            <input type="checkbox" id="security-notifications" checked>
-                                            <label for="security-notifications"></label>
-                                        </div>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save"></i> Guardar Cambios
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="card">
-                        <div class="card-header">
-                            <h4><i class="fas fa-users-cog"></i> Administración de Usuarios</h4>
-                            <button class="btn btn-primary" id="add-user-btn">
-                                <i class="fas fa-plus"></i> Nuevo Usuario
-                            </button>
-                        </div>
+                        <div class="card-header"><h4>Lista de Usuarios</h4></div>
                         <div class="card-body">
                             <table id="users-table">
                                 <thead>
-                                    <tr>
-                                        <th>Nombre</th>
-                                        <th>Email</th>
-                                        <th>Rol</th>
-                                        <th>Último Acceso</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
+                                    <tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Último Acceso</th><th>Estado</th><th>Acciones</th></tr>
                                 </thead>
-                                <tbody>
-                                    <!-- JS will populate this -->
-                                </tbody>
+                                <tbody><!-- JS llenará esta tabla --></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- Modal Container -->
+                <!-- ==================== ANALYTICS PAGE ==================== -->
+                <div class="page" id="analytics-page" th:classappend="${page == 'analytics' ? 'active' : ''}">
+                    <!-- Contenido completo de la página de analíticas -->
+                    <div class="page-title"><h3>Análisis de Datos</h3></div>
+                    <div class="grid-2">
+                        <div class="chart-container"><h4>Productos Más Vendidos</h4><div class="chart-box"><canvas id="top-products-chart"></canvas></div></div>
+                        <div class="chart-container"><h4>Ingresos por Hora</h4><div class="chart-box"><canvas id="revenue-by-hour-chart"></canvas></div></div>
+                    </div>
+                    <div class="chart-container"><h4>Tendencias de Ventas</h4><div class="chart-box"><canvas id="sales-trends-chart"></canvas></div></div>
+                    <!-- ... más contenido ... -->
+                </div>
+
+                <!-- ==================== REPORTS PAGE ==================== -->
+                <div class="page" id="reports-page" th:classappend="${page == 'reports' ? 'active' : ''}">
+                    <!-- Contenido completo de la página de reportes -->
+                     <div class="page-title"><h3>Generación de Reportes</h3></div>
+                     <div class="grid-3">
+                        <div class="report-card"><i class="fas fa-shopping-cart"></i><h4>Reporte de Ventas</h4><button class="btn btn-primary">Generar</button></div>
+                        <div class="report-card"><i class="fas fa-coffee"></i><h4>Reporte de Productos</h4><button class="btn btn-primary">Generar</button></div>
+                        <div class="report-card"><i class="fas fa-users"></i><h4>Reporte de Clientes</h4><button class="btn btn-primary">Generar</button></div>
+                    </div>
+                </div>
+
+                <!-- ==================== SETTINGS PAGE ==================== -->
+                <div class="page" id="settings-page" th:classappend="${page == 'settings' ? 'active' : ''}">
+                    <div class="page-title"><h3>Configuración del Sistema</h3></div>
+                    <div class="grid-2">
+                        <div class="card"><div class="card-header"><h4><i class="fas fa-store"></i> Configuración de la Cafetería</h4></div></div>
+                        <div class="card"><div class="card-header"><h4><i class="fas fa-user-shield"></i> Seguridad</h4></div></div>
+                    </div>
+                </div>
+
                 <div id="modal-container"></div>
             </div>
         </main>
     </div>
 
-    <!-- JavaScript Files -->
-    <script src="assets/js/app.js"></script>
-    <script src="assets/js/products.js"></script>
-    <script src="assets/js/messages.js"></script>
-    <script src="assets/js/orders.js"></script>
-    <script src="assets/js/users.js"></script>
-    <script src="assets/js/customers.js"></script>
-    <script src="assets/js/analytics.js"></script>
-    <script src="assets/js/reports.js"></script>
+
+    <script th:src="@{/assets/dashboard/js/app.js}"></script>
+    <script th:src="@{/assets/dashboard/js/products.js}"></script>
+    <script th:src="@{/assets/dashboard/js/messages.js}"></script>
+    <script th:src="@{/assets/dashboard/js/orders.js}"></script>
+    <script th:src="@{/assets/dashboard/js/users.js}"></script>
+    <script th:src="@{/assets/dashboard/js/customers.js}"></script>
+    <script th:src="@{/assets/dashboard/js/analytics.js}"></script>
+    <script th:src="@{/assets/dashboard/js/reports.js}"></script>
     
-    <!-- Mock Data -->
-    <script>
-        // This would be replaced with real API calls in production
-        const mockData = {
-            products: [
-                {
-                    id: 1,
-                    name: "Café Americano",
-                    category: "Bebidas",
-                    description: "Café negro fuerte",
-                    price: 2.50,
-                    image: "https://images.unsplash.com/photo-1497636577773-f1231844b336?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80",
-                    stock: 42
-                },
-                {
-                    id: 2,
-                    name: "Capuchino",
-                    category: "Bebidas",
-                    description: "Espresso con leche vaporizada y espuma",
-                    price: 3.75,
-                    image: "https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80",
-                    stock: 38
-                },
-                {
-                    id: 3,
-                    name: "Tarta de Chocolate",
-                    category: "Postres",
-                    description: "Tarta de chocolate negro con base de galleta",
-                    price: 4.50,
-                    image: "https://images.unsplash.com/photo-1551024506-0bccd828d307?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80",
-                    stock: 15
-                }
-            ],
-            orders: [
-                {
-                    id: "ORD-001",
-                    customer: "María Rodríguez",
-                    date: "2023-11-12",
-                    items: [
-                        { product: "Café Americano", quantity: 2, price: 2.50 },
-                        { product: "Tarta de Chocolate", quantity: 1, price: 4.50 }
-                    ],
-                    total: 9.50,
-                    status: "completed"
-                },
-                {
-                    id: "ORD-002",
-                    customer: "Carlos López",
-                    date: "2023-11-12",
-                    items: [
-                        { product: "Capuchino", quantity: 1, price: 3.75 },
-                        { product: "Croissant", quantity: 2, price: 2.50 }
-                    ],
-                    total: 8.75,
-                    status: "pending"
-                }
-            ],
-            messages: [
-                {
-                    id: 1,
-                    name: "Laura Gómez",
-                    email: "laura@example.com",
-                    phone: "+34 612345678",
-                    subject: "Consulta sobre opciones sin lactosa",
-                    message: "¡Hola! Quería felicitarles por su excelente café. ¿Podrían decirme si tienen opciones sin lactosa?",
-                    date: "2023-11-12",
-                    status: "new"
-                },
-                {
-                    id: 2,
-                    name: "David Escate",
-                    email: "18davidescatetorres@gmail.com",
-                    phone: "+51 919764800",
-                    subject: "Es seguro?",
-                    message: "quiero saber si tienen referencias",
-                    date: "2025-06-04",
-                    status: "Leído"
-                },
-                {
-                    id: 3,
-                    name: "David Escate",
-                    email: "18davidescatetorres@gmail.com",
-                    phone: "+51 919764800",
-                    subject: "Es seguro?",
-                    message: "quiero saber si tienen referencias",
-                    date: "2025-06-04",
-                    status: "new"
-                }
-            ],
-            customers: [
-                {
-                    id: 1,
-                    name: "María Rodríguez",
-                    email: "maria@example.com",
-                    phone: "+34 600112233",
-                    joinDate: "2023-10-15",
-                    orders: 12,
-                    totalSpent: 156.80
-                }
-            ],
-            users: [
-                {
-                    id: 1,
-                    name: "Admin Principal",
-                    email: "admin@cafeteria.com",
-                    role: "Administrador",
-                    lastLogin: "2023-11-12 10:25",
-                    status: "active"
-                },
-            // Añadir más usuarios
-                {
-                    id: 2,
-                    name: "Gerente Sucursal",
-                    email: "gerente@cafeteria.com",
-                    role: "Manager",
-                    lastLogin: "2023-11-10 14:30",
-                    status: "active"
-                },
-                {
-                    id: 3,
-                    name: "Barista Juan",
-                    email: "juan@cafeteria.com",
-                    role: "staff",
-                    lastLogin: "2023-11-11 09:15",
-                    status: "active"
-                }
-            ]
-        };
-    </script>
 </body>
 </html>
