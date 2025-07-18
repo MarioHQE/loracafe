@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrama de Entidades - Loracafe</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 40px;
+        }
+        .mermaid {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .legend {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        .legend h3 {
+            color: #8B4513;
+            margin-top: 0;
+        }
+        .legend ul {
+            list-style: none;
+            padding: 0;
+        }
+        .legend li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .legend li:last-child {
+            border-bottom: none;
+        }
+        .color-box {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 3px;
+        }
+        .entity-core { background-color: #FF6B6B; }
+        .entity-user { background-color: #4ECDC4; }
+        .entity-order { background-color: #45B7D1; }
+        .entity-product { background-color: #96CEB4; }
+        .entity-payment { background-color: #FFEAA7; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>☕ Loracafe</h1>
+            <p>Diagrama de Entidades del Sistema</p>
+        </div>
+        
+        <div class="content">
+            <div class="mermaid">
+                erDiagram
+                    %% Entidades principales del sistema
+                    USUARIO {
+                        int id PK
+                        string nombre
+                        string apellido
+                        string email UK
+                        string password
+                        string telefono
+                        string direccion
+                        enum rol
+                        datetime fecha_registro
+                        boolean activo
+                    }
+                    
+                    PRODUCTO {
+                        int id PK
+                        string nombre
+                        string descripcion
+                        decimal precio
+                        string categoria
+                        string imagen_url
+                        boolean disponible
+                        int stock
+                        datetime fecha_creacion
+                    }
+                    
+                    PEDIDO {
+                        int id PK
+                        int usuario_id FK
+                        decimal total
+                        enum estado
+                        string direccion_entrega
+                        datetime fecha_pedido
+                        datetime fecha_entrega
+                        string notas
+                    }
+                    
+                    DETALLE_PEDIDO {
+                        int id PK
+                        int pedido_id FK
+                        int producto_id FK
+                        int cantidad
+                        decimal precio_unitario
+                        decimal subtotal
+                    }
+                    
+                    CARRITO {
+                        int id PK
+                        int usuario_id FK
+                        int producto_id FK
+                        int cantidad
+                        datetime fecha_agregado
+                    }
+                    
+                    PAGO {
+                        int id PK
+                        int pedido_id FK
+                        decimal monto
+                        enum metodo_pago
+                        enum estado
+                        string referencia
+                        datetime fecha_pago
+                    }
+                    
+                    CATEGORIA {
+                        int id PK
+                        string nombre
+                        string descripcion
+                        string imagen_url
+                        boolean activa
+                    }
+                    
+                    PROMOCION {
+                        int id PK
+                        string nombre
+                        string descripcion
+                        decimal descuento
+                        enum tipo
+                        datetime fecha_inicio
+                        datetime fecha_fin
+                        boolean activa
+                    }
+                    
+                    PRODUCTO_PROMOCION {
+                        int id PK
+                        int producto_id FK
+                        int promocion_id FK
+                    }
+                    
+                    %% Relaciones
+                    USUARIO ||--o{ PEDIDO : "realiza"
+                    USUARIO ||--o{ CARRITO : "tiene"
+                    
+                    PRODUCTO ||--o{ DETALLE_PEDIDO : "incluido_en"
+                    PRODUCTO ||--o{ CARRITO : "agregado_a"
+                    PRODUCTO }o--|| CATEGORIA : "pertenece_a"
+                    PRODUCTO }o--o{ PROMOCION : "tiene_promocion"
+                    
+                    PEDIDO ||--|| PAGO : "tiene"
+                    PEDIDO ||--o{ DETALLE_PEDIDO : "contiene"
+                    
+                    CATEGORIA ||--o{ PRODUCTO : "contiene"
+                    
+                    PROMOCION }o--o{ PRODUCTO : "aplica_a"
+            </div>
+            
+            <div class="legend">
+                <h3>📋 Leyenda del Diagrama</h3>
+                <ul>
+                    <li><span class="color-box entity-core"></span><strong>Entidades Core:</strong> Usuario, Producto, Pedido - Funcionalidad principal del sistema</li>
+                    <li><span class="color-box entity-user"></span><strong>Entidades de Usuario:</strong> Gestión de clientes y autenticación</li>
+                    <li><span class="color-box entity-order"></span><strong>Entidades de Pedidos:</strong> Gestión de compras y carrito</li>
+                    <li><span class="color-box entity-product"></span><strong>Entidades de Productos:</strong> Catálogo y categorías</li>
+                    <li><span class="color-box entity-payment"></span><strong>Entidades de Pago:</strong> Procesamiento de transacciones</li>
+                </ul>
+                
+                <h3>🔗 Tipos de Relaciones</h3>
+                <ul>
+                    <li><strong>||--o{</strong> Uno a muchos (1:N)</li>
+                    <li><strong>||--||</strong> Uno a uno (1:1)</li>
+                    <li><strong>}o--o{</strong> Muchos a muchos (N:M)</li>
+                </ul>
+                
+                <h3>📝 Notas Técnicas</h3>
+                <ul>
+                    <li><strong>PK:</strong> Primary Key (Clave Primaria)</li>
+                    <li><strong>FK:</strong> Foreign Key (Clave Foránea)</li>
+                    <li><strong>UK:</strong> Unique Key (Clave Única)</li>
+                    <li><strong>enum:</strong> Tipo enumerado (valores predefinidos)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true
+            },
+            er: {
+                useMaxWidth: true,
+                htmlLabels: true
+            }
+        });
+    </script>
+</body>
+</html> 
