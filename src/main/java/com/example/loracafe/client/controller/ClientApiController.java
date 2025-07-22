@@ -20,7 +20,19 @@ import com.mercadopago.exceptions.MPException;
 import com.mercadopago.resources.payment.Payment;
 import com.stripe.Stripe;
 import com.stripe.param.checkout.SessionCreateParams;
+
+import lombok.extern.slf4j.Slf4j;
+
 import com.stripe.model.checkout.Session;
+import com.stripe.model.Event;
+import com.stripe.net.Webhook;
+import org.springframework.beans.factory.annotation.Value;
+import com.example.loracafe.common.service.PedidoService;
+import com.example.loracafe.common.entity.Pedido;
+import com.example.loracafe.common.entity.DetallePedido;
+import com.example.loracafe.common.entity.Producto;
+import com.example.loracafe.common.repository.ProductoRepository;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,6 +47,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/client")
+@Slf4j
 public class ClientApiController {
 
     @Autowired
@@ -51,6 +64,10 @@ public class ClientApiController {
     private PagoMercadoPagoService pagoMercadoPagoService;
     @Autowired
     private StripeService stripeService;
+
+    private String stripeWebhookSecret = "whsec_0413b21f46b91831209ef4ada5ff08fd7428b314238748ae2a4819d5dad629a4";
+    @Autowired
+    private ProductoRepository productoRepository;
 
     // =================================================================
     // ENDPOINTS PÚBLICOS (PRODUCTOS Y PROMOCIONES)
@@ -242,10 +259,40 @@ public class ClientApiController {
     @PostMapping("/pagos/stripe/webhook")
     public ResponseEntity<String> stripeWebhook(@RequestBody String payload,
             @RequestHeader("Stripe-Signature") String sigHeader) {
-        System.out.println("--- Webhook Stripe recibido ---");
-        System.out.println("Payload: " + payload);
-        System.out.println("Signature: " + sigHeader);
-        // Aquí puedes procesar el evento (pago exitoso, etc.)
-        return ResponseEntity.ok("Webhook recibido");
+        try {
+            Event event = Webhook.constructEvent(payload, sigHeader, stripeWebhookSecret);
+            if ("checkout.session.completed".equals(event.getType())) {
+                Session session = (Session) event.getDataObjectDeserializer().getObject().orElse(null);
+                if (session != null && session.getMetadata() != null) {
+                    log.info("Metadata recibido en webhook: " + session.getMetadata());
+                    if (session.getMetadata().containsKey("pedido_id")) {
+                        log.info("ID de pedido recibido en webhook: " + session.getMetadata().get("pedido_id"));
+                    }
+                }
+                if (session != null && session.getMetadata() != null
+                        && session.getMetadata().containsKey("pedido_id")) {
+                    Integer pedidoId = Integer.valueOf(session.getMetadata().get("pedido_id"));
+                    Optional<Pedido> pedidoOpt = pedidoService.getPedidoById(pedidoId);
+                    if (pedidoOpt.isPresent()) {
+                        Pedido pedido = pedidoOpt.get();
+                        pedido.setEstado(Pedido.EstadoPedido.PAGADO);
+                        // Disminuir stock de productos
+                        if (pedido.getDetalles() != null) {
+                            for (DetallePedido detalle : pedido.getDetalles()) {
+                                Producto producto = detalle.getProducto();
+                                int nuevoStock = producto.getStock() - detalle.getCantidad();
+                                producto.setStock(nuevoStock);
+                                productoRepository.save(producto);
+                            }
+                        }
+                        pedidoService.savePedido(pedido);
+                    }
+                }
+            }
+            return ResponseEntity.ok("Webhook procesado");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(400).body("Error procesando webhook: " + e.getMessage());
+        }
     }
 }

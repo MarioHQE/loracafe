@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class StripeService {
@@ -66,8 +68,10 @@ public class StripeService {
         for (SessionCreateParams.LineItem item : lineItems) {
             paramsBuilder.addLineItem(item);
         }
-        // Agregar metadata con el id del pedido
-        paramsBuilder.putMetadata("pedido_id", String.valueOf(pedido.getId()));
+        // Agregar metadata correctamente
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("pedido_id", String.valueOf(pedido.getId()));
+        paramsBuilder.putAllMetadata(metadata);
         Session session = Session.create(paramsBuilder.build());
         return session.getUrl();
     }

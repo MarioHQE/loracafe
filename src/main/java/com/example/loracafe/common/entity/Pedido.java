@@ -43,7 +43,7 @@ public class Pedido {
     private String notas;
 
     @Column(nullable = false)
-private boolean visto = false;
+    private boolean visto = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")
@@ -59,6 +59,7 @@ private boolean visto = false;
     public enum EstadoPedido {
         PENDIENTE,
         EN_PROCESO,
+        PAGADO,
         COMPLETADO,
         CANCELADO
     }
