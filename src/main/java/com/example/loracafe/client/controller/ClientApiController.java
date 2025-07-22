@@ -14,9 +14,13 @@ import com.example.loracafe.common.service.MensajeService;
 import com.example.loracafe.common.service.PedidoService;
 import com.example.loracafe.common.service.UsuarioService;
 import com.example.loracafe.common.service.PagoMercadoPagoService;
+import com.example.loracafe.common.service.StripeService;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
 import com.mercadopago.resources.payment.Payment;
+import com.stripe.Stripe;
+import com.stripe.param.checkout.SessionCreateParams;
+import com.stripe.model.checkout.Session;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +30,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/client")
@@ -43,6 +49,8 @@ public class ClientApiController {
     private PedidoService pedidoService;
     @Autowired
     private PagoMercadoPagoService pagoMercadoPagoService;
+    @Autowired
+    private StripeService stripeService;
 
     // =================================================================
     // ENDPOINTS PÚBLICOS (PRODUCTOS Y PROMOCIONES)
@@ -203,5 +211,41 @@ public class ClientApiController {
         } catch (MPException e) {
             return ResponseEntity.status(500).body("Error al procesar el pago: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/pagos/stripe")
+    public ResponseEntity<?> crearPagoStripe(@RequestBody Map<String, Object> body, Authentication authentication) {
+        Integer pedidoId = null;
+        if (body.get("pedidoId") instanceof Integer) {
+            pedidoId = (Integer) body.get("pedidoId");
+        } else if (body.get("pedidoId") instanceof String) {
+            pedidoId = Integer.valueOf((String) body.get("pedidoId"));
+        }
+        if (pedidoId == null) {
+            return ResponseEntity.badRequest().body("Falta el ID del pedido");
+        }
+        Pedido pedido = pedidoService.getPedidoById(pedidoId).orElse(null);
+        if (pedido == null) {
+            return ResponseEntity.status(404).body("Pedido no encontrado");
+        }
+        try {
+            String url = stripeService.procesarPago(pedido);
+            Map<String, String> resp = new HashMap<>();
+            resp.put("url", url);
+            return ResponseEntity.ok(resp);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error al crear sesión de pago Stripe: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/pagos/stripe/webhook")
+    public ResponseEntity<String> stripeWebhook(@RequestBody String payload,
+            @RequestHeader("Stripe-Signature") String sigHeader) {
+        System.out.println("--- Webhook Stripe recibido ---");
+        System.out.println("Payload: " + payload);
+        System.out.println("Signature: " + sigHeader);
+        // Aquí puedes procesar el evento (pago exitoso, etc.)
+        return ResponseEntity.ok("Webhook recibido");
     }
 }
