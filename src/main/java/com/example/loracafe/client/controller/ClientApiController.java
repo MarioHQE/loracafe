@@ -8,10 +8,16 @@ import com.example.loracafe.common.dto.OrderRequestDto;
 import com.example.loracafe.common.dto.PedidoSimpleDto;
 import com.example.loracafe.common.dto.ProductoClienteDto;
 import com.example.loracafe.common.dto.UserProfileDto;
+import com.example.loracafe.common.dto.MercadoPagoRequestDto;
 import com.example.loracafe.common.entity.*;
 import com.example.loracafe.common.service.MensajeService;
 import com.example.loracafe.common.service.PedidoService;
 import com.example.loracafe.common.service.UsuarioService;
+import com.example.loracafe.common.service.PagoMercadoPagoService;
+import com.mercadopago.exceptions.MPApiException;
+import com.mercadopago.exceptions.MPException;
+import com.mercadopago.resources.payment.Payment;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,21 +41,24 @@ public class ClientApiController {
     private UsuarioService usuarioService;
     @Autowired
     private PedidoService pedidoService;
+    @Autowired
+    private PagoMercadoPagoService pagoMercadoPagoService;
 
     // =================================================================
     // ENDPOINTS PÚBLICOS (PRODUCTOS Y PROMOCIONES)
     // =================================================================
 
-   @GetMapping("/products")
-public ResponseEntity<List<ProductoClienteDto>> getProductsForClient(@RequestParam(required = false) Integer categoriaId) {
-    List<ProductoClienteDto> productos;
-    if (categoriaId != null) {
-        productos = clientProductService.getAvailableProductsByCategory(categoriaId);
-    } else {
-        productos = clientProductService.getAvailableProducts();
+    @GetMapping("/products")
+    public ResponseEntity<List<ProductoClienteDto>> getProductsForClient(
+            @RequestParam(required = false) Integer categoriaId) {
+        List<ProductoClienteDto> productos;
+        if (categoriaId != null) {
+            productos = clientProductService.getAvailableProductsByCategory(categoriaId);
+        } else {
+            productos = clientProductService.getAvailableProducts();
+        }
+        return ResponseEntity.ok(productos);
     }
-    return ResponseEntity.ok(productos);
-}
 
     @GetMapping("/products/{id}")
     public ResponseEntity<Producto> getProductById(@PathVariable Integer id) {
@@ -59,10 +68,10 @@ public ResponseEntity<List<ProductoClienteDto>> getProductsForClient(@RequestPar
     }
 
     @GetMapping("/promotions/active")
-public ResponseEntity<List<PromocionClienteDto>> getActivePromotions() {
-    List<PromocionClienteDto> promociones = clientPromotionService.getActivePromotions();
-    return ResponseEntity.ok(promociones);
-}
+    public ResponseEntity<List<PromocionClienteDto>> getActivePromotions() {
+        List<PromocionClienteDto> promociones = clientPromotionService.getActivePromotions();
+        return ResponseEntity.ok(promociones);
+    }
 
     // =================================================================
     // ENDPOINTS SEGUROS (REQUIEREN AUTENTICACIÓN)
@@ -77,7 +86,7 @@ public ResponseEntity<List<PromocionClienteDto>> getActivePromotions() {
         mensaje.setUsuario(usuarioLogueado);
         mensaje.setNombre(usuarioLogueado.getNombre() + " " + usuarioLogueado.getApellido());
         mensaje.setEmail(userEmail);
-        
+
         mensajeService.guardarNuevoMensaje(mensaje);
         return ResponseEntity.ok().build();
     }
@@ -102,12 +111,11 @@ public ResponseEntity<List<PromocionClienteDto>> getActivePromotions() {
         return usuarioService.getUsuarioByEmail(userEmail)
                 .map(usuario -> {
                     UserProfileDto dto = new UserProfileDto(
-                        usuario.getNombre(),
-                        usuario.getApellido(),
-                        usuario.getEmail(),
-                        usuario.getTelefono(),
-                        usuario.getDireccion()
-                    );
+                            usuario.getNombre(),
+                            usuario.getApellido(),
+                            usuario.getEmail(),
+                            usuario.getTelefono(),
+                            usuario.getDireccion());
                     return ResponseEntity.ok(dto);
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -138,8 +146,18 @@ public ResponseEntity<List<PromocionClienteDto>> getActivePromotions() {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/orders/{id}")
+    public ResponseEntity<PedidoSimpleDto> getPedidoById(@PathVariable Integer id, Authentication authentication) {
+        Pedido pedido = pedidoService.getPedidoById(id).orElse(null);
+        if (pedido == null)
+            return ResponseEntity.notFound().build();
+        // (Opcional: valida que el pedido pertenezca al usuario autenticado)
+        return ResponseEntity.ok(new PedidoSimpleDto(pedido));
+    }
+
     @PostMapping("/orders/create")
-    public ResponseEntity<PedidoSimpleDto> createOrder(@RequestBody OrderRequestDto orderRequest, Authentication authentication) {
+    public ResponseEntity<PedidoSimpleDto> createOrder(@RequestBody OrderRequestDto orderRequest,
+            Authentication authentication) {
         String userEmail = authentication.getName();
         Usuario usuario = usuarioService.getUsuarioByEmail(userEmail)
                 .orElseThrow(() -> new IllegalStateException("Usuario autenticado no encontrado."));
@@ -154,6 +172,26 @@ public ResponseEntity<List<PromocionClienteDto>> getActivePromotions() {
         } catch (RuntimeException e) {
             // Cualquier otro error inesperado
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/pagos/mercadopago")
+    public ResponseEntity<?> procesarPagoMercadoPago(@RequestBody MercadoPagoRequestDto pagoDto,
+            Authentication authentication) throws MPApiException {
+        Pedido pedido = pedidoService.getPedidoById(pagoDto.getPedidoId().intValue()).orElse(null);
+        if (pedido == null) {
+            return ResponseEntity.status(404).body("Pedido no encontrado");
+        }
+        float monto = pedido.getTotal().floatValue();
+        System.out.println("Procesando pago para pedido #" + pedido.getId() + " - Monto: " + monto);
+        try {
+            Payment payment = pagoMercadoPagoService.procesarPago(pagoDto, monto);
+            return ResponseEntity.ok(payment);
+        } catch (MPApiException e) {
+            System.out.println("MPApiException: " + e.getApiResponse().getContent());
+            return ResponseEntity.status(500).body("Error MercadoPago: " + e.getApiResponse().getContent());
+        } catch (MPException e) {
+            return ResponseEntity.status(500).body("Error al procesar el pago: " + e.getMessage());
         }
     }
 }

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"></html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pago - Lora Café</title>
+    <!-- Metatags CSRF para el formulario de pago -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+    <link rel="stylesheet" th:href="@{/assets/cliente/css/EstiloNavbar.css}" />
+    <link rel="stylesheet" th:href="@{/assets/cliente/css/EstiloFooter.css}" />
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <style>
+        body {
+            background: #f9f7f6;
+        }
+        .checkout-container {
+            max-width: 480px;
+            margin: 48px auto 48px auto;
+            background: #fff8f3;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(93,64,55,0.08);
+            padding: 28px 18px 18px 18px;
+            border: 1.5px solid #e0cfc2;
+        }
+        .checkout-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+        .tab-pago.active {
+            background: #8D6E63 !important;
+            color: #fff !important;
+        }
+        .tab-pago:not(.active) {
+            background: #e0cfc2 !important;
+            color: #5D4037 !important;
+        }
+        .tab-pago {
+            flex: 1;
+            padding: 12px 0;
+            border: none;
+            border-radius: 10px 10px 0 0;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .panel-pago { margin-top: 8px; }
+        .container {
+            height: 18px;
+            display: inline-block;
+            border: 1px solid rgb(118, 118, 118);
+            border-radius: 2px;
+            padding: 1px 2px;
+            margin-bottom: 8px;
+        }
+        #form-checkout {
+            display: flex;
+            flex-direction: column;
+            max-width: 600px;
+        }
+        #form-checkout input, #form-checkout select {
+            margin-bottom: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1.5px solid #BCAAA4;
+            background: #f9f7f6;
+            color: #4E342E;
+            font-size: 1rem;
+        }
+        #form-checkout button[type="submit"] {
+            background: #8D6E63;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 0;
+            font-weight: 600;
+            font-size: 1.08rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+            transition: background 0.2s;
+            box-shadow: 0 2px 8px rgba(93, 64, 55, 0.08);
+        }
+        #form-checkout button[type="submit"]:hover, #confirmar-yape-btn:hover {
+            background: #5D4037;
+        }
+        .progress-bar {
+            height: 6px;
+            border-radius: 4px;
+            background: #BCAAA4;
+            margin-top: 6px;
+        }
+        .panel-yape {
+            text-align: center;
+        }
+        .panel-yape img {
+            max-width: 220px;
+            margin: 18px auto 12px auto;
+            display: block;
+        }
+        /* Mejora visual para los contenedores de los campos de Mercado Pago */
+        #form-checkout__cardNumber,
+        #form-checkout__expirationDate,
+        #form-checkout__securityCode {
+            background: #fff;
+            border: 2px solid #BCAAA4;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(93, 64, 55, 0.07);
+            height: 48px;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            margin-bottom: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        #form-checkout__cardNumber:focus-within,
+        #form-checkout__expirationDate:focus-within,
+        #form-checkout__securityCode:focus-within {
+            border-color: #8D6E63;
+            box-shadow: 0 0 0 2px #EFEBE9;
+            background: #fff8f3;
+        }
+        @media (max-width: 600px) {
+            .checkout-container {
+                max-width: 98vw;
+                padding: 12vw 2vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{Cliente/fragments/navbar :: navbar}"></div>
+    <main>
+        <div class="checkout-container">
+            <h2 style="color: #5D4037; text-align: center; margin-bottom: 18px;">Selecciona tu método de pago</h2>
+            <div class="checkout-tabs">
+                <button class="tab-pago active" data-tab="tarjeta">Tarjeta (Mercado Pago)</button>
+                <button class="tab-pago" data-tab="yape">Yape / Plin</button>
+            </div>
+            <div style="text-align:center;margin-bottom:18px;">
+                <b>Total a pagar:</b> <span id="monto-total-pago">Cargando...</span>
+            </div>
+            <div id="panel-tarjeta" class="panel-pago" style="display:block;">
+                <form id="form-checkout">
+                    <div id="form-checkout__cardNumber" class="container"></div>
+                    <div id="form-checkout__expirationDate" class="container"></div>
+                    <div id="form-checkout__securityCode" class="container"></div>
+                    <input type="text" id="form-checkout__cardholderName" placeholder="Titular de la tarjeta" />
+                    <select id="form-checkout__issuer" placeholder="Banco emisor"></select>
+                    <select id="form-checkout__installments" placeholder="Cuotas"></select>
+                    <select id="form-checkout__identificationType" placeholder="Tipo de documento"></select>
+                    <input type="text" id="form-checkout__identificationNumber" placeholder="Número del documento" />
+                    <input type="email" id="form-checkout__cardholderEmail" placeholder="E-mail" />
+                    <button type="submit" id="form-checkout__submit">Confirmar pago</button>
+                    <progress value="0" class="progress-bar">Cargando...</progress>
+                </form>
+            </div>
+            <div id="panel-yape" class="panel-pago panel-yape" style="display:none;">
+                <h4 style="color:#5D4037;">Escanea para pagar con Yape o Plin</h4>
+                <img src="/img/img-pago/pago_qr.jpg" alt="Código QR de pago" />
+                <p>Una vez realizado el pago, haz clic en "Confirmar pago" para finalizar tu pedido.</p>
+                <button id="confirmar-yape-btn" style="background:#8D6E63;color:#fff;border:none;border-radius:10px;padding:12px 32px;font-weight:600;font-size:1.08rem;cursor:pointer;">Confirmar pago</button>
+            </div>
+        </div>
+    </main>
+    <div th:replace="~{Cliente/fragments/footer :: footer}"></div>
+    <script>
+    function getCsrfToken() {
+        const token = document.querySelector('meta[name="_csrf"]')?.content;
+        const header = document.querySelector('meta[name="_csrf_header"]')?.content;
+        return { token, header };
+    }
+    document.addEventListener("DOMContentLoaded", () => {
+        const tabs = document.querySelectorAll('.tab-pago');
+        const panelTarjeta = document.getElementById('panel-tarjeta');
+        const panelYape = document.getElementById('panel-yape');
+        let mpMounted = false;
+        let cardForm = null;
+        function getPedidoId() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+        const pedidoId = getPedidoId();
+        let montoPedido = 100.00; // valor por defecto
+        async function obtenerPedidoYMostrarTotal() {
+            if (!pedidoId) return;
+            const response = await fetch(`/api/client/orders/${pedidoId}`);
+            if (response.ok) {
+                const pedido = await response.json();
+                montoPedido = pedido.total;
+                document.getElementById('monto-total-pago').textContent = 'S/ ' + Number(montoPedido).toFixed(2);
+                inicializarMercadoPagoConMonto(montoPedido);
+            } else {
+                document.getElementById('monto-total-pago').textContent = 'No disponible';
+            }
+        }
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                if (tab.dataset.tab === 'tarjeta') {
+                    panelTarjeta.style.display = 'block';
+                    panelYape.style.display = 'none';
+                    if (!mpMounted) {
+                        inicializarMercadoPagoConMonto(montoPedido);
+                        mpMounted = true;
+                    }
+                } else {
+                    panelTarjeta.style.display = 'none';
+                    panelYape.style.display = 'block';
+                }
+            });
+        });
+        function inicializarMercadoPagoConMonto(monto) {
+            ["form-checkout__cardNumber","form-checkout__expirationDate","form-checkout__securityCode"].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = '';
+            });
+            const mp = new MercadoPago("APP_USR-2e01dac0-b3cf-40a1-b358-b86c7586eeeb");
+            cardForm = mp.cardForm({
+                amount: Number(monto).toFixed(2),
+                iframe: true,
+                form: {
+                    id: "form-checkout",
+                    cardNumber: { id: "form-checkout__cardNumber", placeholder: "Numero de tarjeta" },
+                    expirationDate: { id: "form-checkout__expirationDate", placeholder: "MM/YY" },
+                    securityCode: { id: "form-checkout__securityCode", placeholder: "Código de seguridad" },
+                    cardholderName: { id: "form-checkout__cardholderName", placeholder: "Titular de la tarjeta" },
+                    issuer: { id: "form-checkout__issuer", placeholder: "Banco emisor" },
+                    installments: { id: "form-checkout__installments", placeholder: "Cuotas" },
+                    identificationType: { id: "form-checkout__identificationType", placeholder: "Tipo de documento" },
+                    identificationNumber: { id: "form-checkout__identificationNumber", placeholder: "Número del documento" },
+                    cardholderEmail: { id: "form-checkout__cardholderEmail", placeholder: "E-mail" },
+                },
+                callbacks: {
+                    onFormMounted: error => {
+                        if (error) return console.warn("Form Mounted handling error: ", error);
+                        console.log("Form mounted");
+                    },
+                    onFetching: (resource) => {
+                        const progressBar = document.querySelector(".progress-bar");
+                        progressBar.removeAttribute("value");
+                        return () => {
+                            progressBar.setAttribute("value", "0");
+                        };
+                    }
+                },
+            });
+        }
+        // Montar Mercado Pago con el monto real del pedido
+        obtenerPedidoYMostrarTotal();
+        // --- INTEGRACIÓN DEL SUBMIT DEL FORMULARIO ---
+        const form = document.getElementById('form-checkout');
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const data = cardForm.getCardFormData();
+            const pagoRequest = {
+                pedidoId: pedidoId,
+                token: data.token,
+                paymentMethodId: data.paymentMethodId,
+                issuerId: data.issuerId,
+                email: data.cardholderEmail,
+                installments: data.installments,
+                identificationType: data.identificationType,
+                identificationNumber: data.identificationNumber
+            };
+            const csrf = getCsrfToken();
+            const response = await fetch('/api/client/pagos/mercadopago', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrf.header]: csrf.token
+                },
+                body: JSON.stringify(pagoRequest)
+            });
+            if (response.ok) {
+                const pago = await response.json();
+                alert('¡Pago realizado con éxito! Estado: ' + pago.status);
+                // window.location.href = '/Cliente/confirmacion?id=' + pedidoId;
+            } else {
+                const error = await response.text();
+                alert('Error al procesar el pago: ' + error);
+            }
+        });
+    });
+    </script>
+</body>
+</html> 

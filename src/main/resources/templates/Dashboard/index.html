@@ -77,6 +77,10 @@
                     <i class="fas fa-file-alt"></i>
                     <span>Reportes</span>
                 </a>
+                <a href="#" class="menu-item" id="menu-categories" onclick="showPage('categories-page')">
+                    <i class="fas fa-list"></i>
+                    <span>Categorías</span>
+                </a>
                 
                 <!-- Usamos un div para el logout porque se maneja con un formulario JS -->
                 <div class="menu-item" id="logout-dashboard">
@@ -481,8 +485,120 @@
                     </div>
                 </div>
 
+                <!-- ==================== CATEGORIES PAGE ==================== -->
+                <div class="page" id="categories-page" th:classappend="${page == 'categories' ? 'active' : ''}">
+                    <div class="page-title">
+                        <h3>Gestión de Categorías</h3>
+                        <button class="btn btn-primary" id="add-category-btn"><i class="fas fa-plus"></i> Agregar Categoría</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Lista de Categorías</h4>
+                        </div>
+                        <div class="card-body">
+                            <table id="categories-table">
+                                <thead>
+                                    <tr>
+                                        <th style="display:none;">ID</th>
+                                        <th>Nombre</th>
+                                        <th>Descripción</th>
+                                        <th>Imagen</th>
+                                        <th>Activa</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody><!-- JS llenará esta tabla --></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
-               
+                <!-- Modal para agregar categoría -->
+                <div id="category-modal" class="modal" style="display:none;">
+                    <div class="modal-content">
+                        <span class="close" id="close-category-modal">&times;</span>
+                        <h3>Agregar Nueva Categoría</h3>
+                        <form id="category-form">
+                            <input type="hidden" id="category-id" name="id">
+                            <div class="form-group">
+                                <label for="category-nombre">Nombre *</label>
+                                <input type="text" id="category-nombre" name="nombre" required maxlength="100">
+                            </div>
+                            <div class="form-group">
+                                <label for="category-descripcion">Descripción</label>
+                                <input type="text" id="category-descripcion" name="descripcion" maxlength="255">
+                            </div>
+                            <div class="form-group">
+                                <label for="category-imagenUrl">URL de Imagen</label>
+                                <input type="text" id="category-imagenUrl" name="imagenUrl" maxlength="255">
+                            </div>
+                            <div class="form-group">
+                                <label for="category-activa">
+                                    <input type="checkbox" id="category-activa" name="activa" checked>
+                                    Activa
+                                </label>
+                            </div>
+                            <button type="submit" class="btn btn-success">Guardar</button>
+                        </form>
+                        <div id="category-form-message"></div>
+                    </div>
+                </div>
+
+                <!-- Agregar estilos básicos para el modal si no existen -->
+                <style>
+                .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background: rgba(0,0,0,0.4); }
+                .modal-content { background: #fff; margin: 5% auto; padding: 20px; border-radius: 12px; width: 100%; max-width: 400px; position: relative; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+                .close { position: absolute; right: 16px; top: 8px; font-size: 28px; font-weight: bold; cursor: pointer; color: #8D6E63; }
+                .form-group { margin-bottom: 18px; }
+                .form-group label { display: block; margin-bottom: 6px; font-weight: 500; color: #5D4037; letter-spacing: 0.5px; }
+                .form-group input[type="text"],
+                .form-group input[type="url"],
+                .form-group input[type="email"],
+                .form-group input[type="password"] {
+                    width: 100%;
+                    padding: 10px 14px;
+                    border: 1.5px solid #BCAAA4;
+                    border-radius: 8px;
+                    font-size: 1rem;
+                    background: #f9f7f6;
+                    color: #4E342E;
+                    transition: border-color 0.2s, box-shadow 0.2s;
+                    outline: none;
+                    box-sizing: border-box;
+                }
+                .form-group input[type="text"]:focus,
+                .form-group input[type="url"]:focus,
+                .form-group input[type="email"]:focus,
+                .form-group input[type="password"]:focus {
+                    border-color: #8D6E63;
+                    box-shadow: 0 0 0 2px #EFEBE9;
+                    background: #fff;
+                }
+                .form-group input[type="checkbox"] {
+                    accent-color: #8D6E63;
+                    margin-right: 6px;
+                }
+                .btn-success {
+                    background: #8D6E63;
+                    color: #fff;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 10px 20px;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    transition: background 0.2s;
+                }
+                .btn-success:hover {
+                    background: #5D4037;
+                }
+                #category-form-message {
+                    margin-top: 10px;
+                    color: #c0392b;
+                    font-size: 0.95rem;
+                    text-align: center;
+                }
+                </style>
 
                 <div id="modal-container"></div>
             </div>
@@ -491,6 +607,7 @@
 
 
     <script th:src="@{/assets/dashboard/js/app.js}"></script>
+    <script th:src="@{/assets/dashboard/js/categoria.js}"></script>
     <script th:src="@{/assets/dashboard/js/products.js}"></script>
     <script th:src="@{/assets/dashboard/js/promotions.js}"></script>
     <script th:src="@{/assets/dashboard/js/messages.js}"></script>
@@ -499,6 +616,23 @@
     <script th:src="@{/assets/dashboard/js/customers.js}"></script>
     <script th:src="@{/assets/dashboard/js/analytics.js}"></script>
     <script th:src="@{/assets/dashboard/js/reports.js}"></script>
+
+    <script>
+function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    // Opcional: cambiar el título de la página
+    const pageTitle = document.getElementById('page-title');
+    if (pageTitle) {
+        switch(pageId) {
+            case 'categories-page':
+                pageTitle.textContent = 'Categorías';
+                break;
+            // otros casos si lo deseas
+        }
+    }
+}
+</script>
 
 </body>
 

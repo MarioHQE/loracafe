@@ -6,15 +6,115 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Carrito de Compras - Lora Café</title>
     <!-- Metatags CSRF para el formulario de pago -->
-    <meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-    
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
     <script src="https://kit.fontawesome.com/eb344c5846.js" crossorigin="anonymous"></script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-    
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+
     <link rel="stylesheet" th:href="@{/assets/cliente/css/EstiloNavbar.css}" />
     <link rel="stylesheet" th:href="@{/assets/cliente/css/Carrito.css}" />
     <link rel="stylesheet" th:href="@{/assets/cliente/css/EstiloFooter.css}" />
+    <style>
+        /* === FORMULARIO DE MERCADOPAGO ADAPTADO AL ESTILO DEL CLIENTE === */
+        .mp-form {
+            background: #fff8f3;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(93, 64, 55, 0.08);
+            padding: 28px 18px 18px 18px;
+            max-width: 440px;
+            margin: 0 auto;
+            font-family: 'Poppins', Arial, sans-serif;
+            border: 1.5px solid #e0cfc2;
+        }
+
+        .mp-form h4 {
+            color: #5D4037;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .mp-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .mp-input,
+        .mp-form input,
+        .mp-form select {
+            flex: 1 1 120px;
+            min-width: 120px;
+            padding: 12px 14px;
+            border: 1.5px solid #BCAAA4;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: #f9f7f6;
+            color: #4E342E;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .mp-input:focus,
+        .mp-form input:focus,
+        .mp-form select:focus {
+            border-color: #8D6E63;
+            box-shadow: 0 0 0 2px #EFEBE9;
+            background: #fff;
+        }
+
+        .mp-form label {
+            font-weight: 500;
+            color: #7B5E47;
+            margin-bottom: 4px;
+            display: block;
+            font-size: 0.98rem;
+        }
+
+        .btn-success,
+        .mp-form button[type="submit"] {
+            background: #8D6E63;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 0;
+            font-weight: 600;
+            font-size: 1.08rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+            transition: background 0.2s;
+            box-shadow: 0 2px 8px rgba(93, 64, 55, 0.08);
+        }
+
+        .btn-success:hover,
+        .mp-form button[type="submit"]:hover {
+            background: #5D4037;
+        }
+
+        .progress-bar {
+            height: 6px;
+            border-radius: 4px;
+            background: #BCAAA4;
+        }
+
+        @media (max-width: 600px) {
+            .mp-form {
+                padding: 16px 4vw;
+                max-width: 98vw;
+            }
+
+            .mp-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+        
+    </style>
 </head>
 
 <body>
@@ -63,110 +163,157 @@
                         <span>Total:</span>
                         <span id="total-precio">S/ 0.00</span>
                     </div>
-                    <button id="comprar-btn" class="btn-primary btn-checkout">Proceder al Pago</button>
+                    <div style="margin:18px 0 8px 0;">
+                        <label for="direccion-entrega" style="font-weight:600;color:#5D4037;">Dirección de entrega <span style="color:#c00">*</span></label>
+                        <input type="text" id="direccion-entrega" placeholder="Ej: Calle 123, Urb. Centro" style="width:100%;margin-bottom:10px;padding:10px 12px;border-radius:8px;border:1.5px solid #BCAAA4;background:#f9f7f6;color:#4E342E;font-size:1rem;" required />
+                        <label for="notas-pedido" style="font-weight:600;color:#5D4037;">Notas (opcional)</label>
+                        <textarea id="notas-pedido" placeholder="Ej: Dejar en portería, llamar antes de llegar..." style="width:100%;min-height:48px;max-height:120px;margin-bottom:10px;padding:10px 12px;border-radius:8px;border:1.5px solid #BCAAA4;background:#f9f7f6;color:#4E342E;font-size:1rem;"></textarea>
+                    </div>
+                    <button id="procesar-pago-btn" class="btn-primary btn-checkout" style="margin-top:8px;">Procesar al Pago</button>
                     <button id="reiniciar-btn" class="btn-secondary">Vaciar Carrito</button>
                 </div>
             </div>
         </div>
-        
-        <!-- ====================================================== -->
-<!--         NUEVO MODAL DE PAGO - VERSIÓN PROFESIONAL      -->
-<!-- ====================================================== -->
-<div id="modal-pago" class="modal">
-    <div class="modal-contenido">
-        <div class="modal-header">
-            <h3>Finalizar Compra</h3>
-            <span id="cerrar-modal" class="close">×</span>
-        </div>
-
-        <div class="modal-body">
-            <!-- Pestañas para seleccionar el método de pago -->
-            <div class="payment-methods">
-                <button class="payment-method-btn active" data-method="tarjeta">
-                    <ion-icon name="card-outline"></ion-icon> Tarjeta de Crédito/Débito
-                </button>
-                <button class="payment-method-btn" data-method="billetera">
-                    <ion-icon name="phone-portrait-outline"></ion-icon> Billetera Móvil (Yape/Plin)
-                </button>
-            </div>
-
-            <!-- Contenido que cambia según la pestaña seleccionada -->
-            <div class="payment-content">
-
-                <!-- SECCIÓN TARJETA (Visible por defecto) -->
-                <div id="tarjeta-content" class="payment-panel active">
-                    <form id="formulario-pago">
-                        <div class="form-section">
-                            <h4>1. Información de Contacto y Envío</h4>
-                            <div class="input-box">
-                                <label for="email">Correo electrónico</label>
-                                <input type="email" id="email" placeholder="ejemplo@gmail.com" required />
-                            </div>
-                            <div class="input-box">
-                                <label for="direccion">Dirección de Entrega</label>
-                                <input type="text" id="direccion" placeholder="Av. Principal 123, Distrito" required />
-                            </div>
-                        </div>
-
-                        <hr class="divider">
-
-                        <div class="form-section">
-                            <h4>2. Detalles de la Tarjeta</h4>
-                            <div class="input-box">
-                                <label for="numero-tarjeta">Número de tarjeta</label>
-                                <div class="input-with-icon">
-                                    <input type="text" id="numero-tarjeta" placeholder="0000 0000 0000 0000" required pattern="\d{16}" title="Debe tener 16 dígitos" />
-                                    <ion-icon name="card-outline" class="input-icon"></ion-icon>
-                                </div>
-                            </div>
-                            <div class="input-group">
-                                <div class="input-box">
-                                    <label for="fecha-expiracion-mes">Expira (MM/AA)</label>
-                                    <div class="expiry-group">
-                                        <input type="text" id="fecha-expiracion-mes" placeholder="MM" required pattern="\d{2}" title="Mes (01-12)">
-                                        <span>/</span>
-                                        <input type="text" id="fecha-expiracion-ano" placeholder="AA" required pattern="\d{2}" title="Año (ej. 25)">
-                                    </div>
-                                </div>
-                                <div class="input-box">
-                                    <label for="cvv">CVV</label>
-                                    <div class="input-with-icon">
-                                        <input type="text" id="cvv" placeholder="123" required pattern="\d{3}" title="Debe tener 3 dígitos" />
-                                        <ion-icon name="help-circle-outline" class="input-icon" title="Los 3 dígitos en la parte posterior de su tarjeta"></ion-icon>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- SECCIÓN BILLETERA MÓVIL (Oculta por defecto) -->
-                <div id="billetera-content" class="payment-panel">
-                    <div class="qr-code-container">
-                        <h4>Escanea para Pagar con Yape o Plin</h4>
-                        <img th:src="@{/img/img-pago/pago_qr.jpg}" alt="Código QR de pago" class="qr-code-img">
-                        <p>Una vez realizado el pago, haz clic en "Confirmar Pago" para finalizar tu pedido.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal-footer">
-            <div class="total-summary">
-                <span>Total a Pagar:</span>
-                <strong id="modal-total-precio">S/ 0.00</strong>
-            </div>
-            <button type="submit" form="formulario-pago" class="btn-pay-final">
-                <ion-icon name="shield-checkmark-outline"></ion-icon> Pagar Ahora
-            </button>
-        </div>
-    </div>
-</div>
-
     </main>
+    <section id="seccion-pago" style="display:none;max-width:480px;margin:40px auto 40px auto;background:#fff8f3;border-radius:16px;box-shadow:0 4px 24px rgba(93,64,55,0.08);padding:28px 18px 18px 18px;border:1.5px solid #e0cfc2;">
+        <div style="display:flex;justify-content:center;margin-bottom:18px;">
+            <button class="tab-pago active" data-tab="tarjeta" style="flex:1;padding:12px 0;border:none;border-radius:10px 0 0 10px;background:#8D6E63;color:#fff;font-weight:600;font-size:1rem;cursor:pointer;">Tarjeta (Mercado Pago)</button>
+            <button class="tab-pago" data-tab="yape" style="flex:1;padding:12px 0;border:none;border-radius:0 10px 10px 0;background:#e0cfc2;color:#5D4037;font-weight:600;font-size:1rem;cursor:pointer;">Yape / Plin</button>
+        </div>
+        <div id="panel-tarjeta" class="panel-pago" style="display:block;">
+            <form id="form-checkout">
+                <div id="form-checkout__cardNumber" class="container"></div>
+                <div id="form-checkout__expirationDate" class="container"></div>
+                <div id="form-checkout__securityCode" class="container"></div>
+                <input type="text" id="form-checkout__cardholderName" placeholder="Titular de la tarjeta" />
+                <select id="form-checkout__issuer" placeholder="Banco emisor"></select>
+                <select id="form-checkout__installments" placeholder="Cuotas"></select>
+                <select id="form-checkout__identificationType" placeholder="Tipo de documento"></select>
+                <input type="text" id="form-checkout__identificationNumber" placeholder="Número del documento" />
+                <input type="email" id="form-checkout__cardholderEmail" placeholder="E-mail" />
+                <button type="submit" id="form-checkout__submit">Pagar</button>
+                <progress value="0" class="progress-bar">Cargando...</progress>
+            </form>
+        </div>
+        <div id="panel-yape" class="panel-pago" style="display:none;text-align:center;">
+            <h4 style="color:#5D4037;">Escanea para pagar con Yape o Plin</h4>
+            <img src="/img/img-pago/pago_qr.jpg" alt="Código QR de pago" style="max-width:220px;margin:18px auto 12px auto;display:block;" />
+            <p>Una vez realizado el pago, haz clic en "Confirmar pago" para finalizar tu pedido.</p>
+            <button id="confirmar-yape-btn" style="background:#8D6E63;color:#fff;border:none;border-radius:10px;padding:12px 32px;font-weight:600;font-size:1.08rem;cursor:pointer;">Confirmar pago</button>
+        </div>
+    </section>
+    <style>
+        .tab-pago.active {
+            background: #8D6E63 !important;
+            color: #fff !important;
+        }
+        .tab-pago:not(.active) {
+            background: #e0cfc2 !important;
+            color: #5D4037 !important;
+        }
+        #seccion-pago .container {
+            height: 18px;
+            display: inline-block;
+            border: 1px solid rgb(118, 118, 118);
+            border-radius: 2px;
+            padding: 1px 2px;
+            margin-bottom: 8px;
+        }
+        #seccion-pago #form-checkout {
+            display: flex;
+            flex-direction: column;
+            max-width: 600px;
+        }
+        #seccion-pago input, #seccion-pago select {
+            margin-bottom: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1.5px solid #BCAAA4;
+            background: #f9f7f6;
+            color: #4E342E;
+            font-size: 1rem;
+        }
+        #seccion-pago button[type="submit"] {
+            background: #8D6E63;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 0;
+            font-weight: 600;
+            font-size: 1.08rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+            transition: background 0.2s;
+            box-shadow: 0 2px 8px rgba(93, 64, 55, 0.08);
+        }
+        #seccion-pago button[type="submit"]:hover, #confirmar-yape-btn:hover {
+            background: #5D4037;
+        }
+        #seccion-pago .progress-bar {
+            height: 6px;
+            border-radius: 4px;
+            background: #BCAAA4;
+            margin-top: 6px;
+        }
+    </style>
+    <hr style="margin: 40px 0;">
+    <!-- Apartado de práctica eliminado para evitar conflicto de IDs con el modal -->
     <div th:replace="~{Cliente/fragments/footer :: footer}"></div>
-    
     <script th:src="@{/assets/cliente/js/Carrito.js}"></script>
     <script th:src="@{/assets/cliente/js/Navbar.js}"></script>
+    <script>
+    function getCsrfToken() {
+        const token = document.querySelector('meta[name="_csrf"]')?.content;
+        const header = document.querySelector('meta[name="_csrf_header"]')?.content;
+        return { token, header };
+    }
+    document.addEventListener("DOMContentLoaded", () => {
+        const btnProcesarPago = document.getElementById('procesar-pago-btn');
+        if (btnProcesarPago) {
+            btnProcesarPago.addEventListener('click', async () => {
+                const carrito = JSON.parse(localStorage.getItem("productos")) || [];
+                if (carrito.length === 0) {
+                    alert("Tu carrito está vacío.");
+                    return;
+                }
+                const direccion = document.getElementById('direccion-entrega').value.trim();
+                if (!direccion) {
+                    alert('La dirección de entrega es obligatoria.');
+                    document.getElementById('direccion-entrega').focus();
+                    return;
+                }
+                const notas = document.getElementById('notas-pedido').value.trim();
+                const orderRequest = {
+                    items: carrito.map(item => ({ productoId: item.id, cantidad: item.cantidad })),
+                    direccionEntrega: direccion,
+                    notas: notas
+                };
+                const csrf = getCsrfToken();
+                try {
+                    const response = await fetch('/api/client/orders/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            [csrf.header]: csrf.token
+                        },
+                        body: JSON.stringify(orderRequest)
+                    });
+                    if (response.ok) {
+                        const pedido = await response.json();
+                        window.location.href = `/Cliente/pago?id=${pedido.id}`;
+                    } else if (response.status === 401 || response.status === 403) {
+                        window.location.href = '/login';
+                    } else {
+                        alert('No se pudo crear el pedido. Intenta de nuevo.');
+                    }
+                } catch (e) {
+                    alert('Error de conexión. Intenta de nuevo.');
+                }
+            });
+        }
+    });
+    </script>
 </body>
+
 </html>

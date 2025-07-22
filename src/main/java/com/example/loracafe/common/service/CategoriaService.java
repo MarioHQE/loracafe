@@ -1,6 +1,5 @@
 package com.example.loracafe.common.service;
 
-
 import com.example.loracafe.common.entity.Categoria;
 import com.example.loracafe.common.repository.CategoriaRepository;
 
@@ -20,7 +19,7 @@ public class CategoriaService {
     public List<Categoria> getAllCategorias() {
         return categoriaRepository.findAll();
     }
-    
+
     public List<Categoria> getAllCategoriasActivas() {
         return categoriaRepository.findByActiva(true);
     }
@@ -37,5 +36,18 @@ public class CategoriaService {
     @Transactional
     public void deleteCategoria(Integer id) {
         categoriaRepository.deleteById(id);
+    }
+
+    @Transactional
+    public Categoria updateCategoria(Integer id, Categoria categoria) {
+        Categoria categoriaExistente = getCategoriaById(id).orElse(null);
+        if (categoriaExistente != null) {
+            categoriaExistente.setNombre(categoria.getNombre());
+            categoriaExistente.setDescripcion(categoria.getDescripcion());
+            categoriaExistente.setImagenUrl(categoria.getImagenUrl());
+            categoriaExistente.setActiva(categoria.isActiva()); // Ahora también actualiza 'activa'
+            return categoriaRepository.save(categoriaExistente);
+        }
+        return null;
     }
 }

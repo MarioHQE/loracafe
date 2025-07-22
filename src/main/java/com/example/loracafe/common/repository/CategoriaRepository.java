@@ -8,20 +8,20 @@ import com.example.loracafe.common.entity.Categoria;
 import java.util.List;
 
 /**
- 
-  @param Categoria 
-  @param Integer 
+ * 
+ * @param CategoriaService
+ * @param Integer
  */
 @Repository
 public interface CategoriaRepository extends JpaRepository<Categoria, Integer> {
 
-    /**
-     
-      @param activa
-      @return
-     */
-    List<Categoria> findByActiva(boolean activa);
+  /**
+   * 
+   * @param activa
+   * @return
+   */
+  List<Categoria> findByActiva(boolean activa);
 
-    // NUEVO MÉTODO PARA EL CLIENTE:
-    List<Categoria> findByActivaTrue();
+  // NUEVO MÉTODO PARA EL CLIENTE:
+  List<Categoria> findByActivaTrue();
 }

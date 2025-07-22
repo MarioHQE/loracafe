@@ -13,9 +13,12 @@ const carritoResumen = document.getElementById("carrito-resumen");
 const formularioPago = document.getElementById('formulario-pago');
 const emptyCartMsg = document.getElementById("empty-cart-message");
 
+let cardFormInstance = null;
+
 /**
  * Listener principal que se ejecuta al cargar la página del carrito.
  */
+// === MONTA EL SDK DE MERCADO PAGO DIRECTAMENTE ===
 document.addEventListener("DOMContentLoaded", () => {
     cargarCarrito();
 
@@ -32,6 +35,69 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.addEventListener("click", (event) => {
         if (event.target === modalPago) cerrarModalPago();
+    });
+
+    // === INICIALIZACIÓN SDK MERCADO PAGO PARA PRÁCTICA ===
+    const mp = new MercadoPago("APP_USR-2e01dac0-b3cf-40a1-b358-b86c7586eeeb");
+    mp.cardForm({
+        amount: "100.00",
+        iframe: true,
+        form: {
+            id: "form-checkout",
+            cardNumber: {
+                id: "form-checkout__cardNumber",
+                placeholder: "Numero de tarjeta",
+            },
+            expirationDate: {
+                id: "form-checkout__expirationDate",
+                placeholder: "MM/YY",
+            },
+            securityCode: {
+                id: "form-checkout__securityCode",
+                placeholder: "Código de seguridad",
+            },
+            cardholderName: {
+                id: "form-checkout__cardholderName",
+                placeholder: "Titular de la tarjeta",
+            },
+            issuer: {
+                id: "form-checkout__issuer",
+                placeholder: "Banco emisor",
+            },
+            installments: {
+                id: "form-checkout__installments",
+                placeholder: "Cuotas",
+            },
+            identificationType: {
+                id: "form-checkout__identificationType",
+                placeholder: "Tipo de documento",
+            },
+            identificationNumber: {
+                id: "form-checkout__identificationNumber",
+                placeholder: "Número del documento",
+            },
+            cardholderEmail: {
+                id: "form-checkout__cardholderEmail",
+                placeholder: "E-mail",
+            },
+        },
+        callbacks: {
+            onFormMounted: error => {
+                if (error) return console.warn("Form Mounted handling error: ", error);
+                console.log("Form mounted");
+            },
+            onSubmit: event => {
+                event.preventDefault();
+                alert('¡Práctica: datos listos para enviar al backend!');
+            },
+            onFetching: (resource) => {
+                const progressBar = document.querySelector(".progress-bar");
+                progressBar.removeAttribute("value");
+                return () => {
+                    progressBar.setAttribute("value", "0");
+                };
+            }
+        },
     });
 });
 
@@ -114,15 +180,85 @@ function reiniciarCarrito() {
     }
 }
 
+function inicializarMercadoPago() {
+    if (cardFormInstance) return; // Ya está inicializado
+    const form = document.getElementById('form-checkout');
+    if (!form) return;
+    // Obtener la clave pública y el monto desde los atributos del formulario
+    const publicKey = form.getAttribute('data-mp-public-key') || 'APP_USR-2e01dac0-b3cf-40a1-b358-b86c7586eeeb';
+    const amount = getTotalPago();
+    const mp = new MercadoPago(publicKey, { locale: 'es-PE' });
+    cardFormInstance = mp.cardForm({
+        amount: amount,
+        autoMount: true,
+        form: {
+            id: 'form-checkout',
+            cardholderName: { id: 'form-checkout__cardholderName', placeholder: 'Nombre en la tarjeta' },
+            cardholderEmail: { id: 'form-checkout__cardholderEmail', placeholder: 'ejemplo@email.com' },
+            cardNumber: { id: 'form-checkout__cardNumber', placeholder: 'Número de la tarjeta' },
+            securityCode: { id: 'form-checkout__securityCode', placeholder: 'CVV' },
+            expirationDate: { id: 'form-checkout__expirationDate', placeholder: 'MM/AA' },
+            installments: { id: 'form-checkout__installments' },
+            identificationType: { id: 'form-checkout__identificationType' },
+            identificationNumber: { id: 'form-checkout__identificationNumber', placeholder: 'Documento' },
+            issuer: { id: 'form-checkout__issuer' }
+        },
+        callbacks: {
+            onFormMounted: error => {
+                if (error) return console.warn('Form Mounted handling error: ', error);
+            },
+            onSubmit: event => {
+                event.preventDefault();
+                const data = cardFormInstance.getCardFormData();
+                // Aquí debes enviar los datos a tu backend para crear el pago con la API de Mercado Pago
+                fetch('/api/mercadopago/checkout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Agrega CSRF si es necesario
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(res => res.json())
+                .then(result => {
+                    if (result.status === 'approved') {
+                        alert('¡Pago realizado con éxito!');
+                        // Aquí puedes redirigir o mostrar confirmación
+                    } else {
+                        alert('Pago pendiente o fallido: ' + (result.status_detail || '')); 
+                    }
+                })
+                .catch(err => {
+                    alert('Error procesando el pago');
+                    console.error(err);
+                });
+            },
+            onFetching: (resource) => {
+                document.querySelector('.progress-bar').removeAttribute('value');
+                return () => {
+                    document.querySelector('.progress-bar').setAttribute('value', '0');
+                };
+            }
+        }
+    });
+}
+
 function mostrarModalPago() {
     if (!modalPago) return;
     const total = document.getElementById('total-precio').textContent;
     document.getElementById('modal-total-precio').textContent = total;
     modalPago.classList.add("active");
-    setupPaymentMethodTabs(); 
+    setupPaymentMethodTabs();
+    setTimeout(() => {
+        cardFormInstance = null; // Reinicia la instancia para forzar el montaje
+        inicializarMercadoPago();
+    }, 400);
 }
 
-function cerrarModalPago() { if (modalPago) modalPago.classList.remove("active"); }
+function cerrarModalPago() {
+    if (modalPago) modalPago.classList.remove("active");
+    cardFormInstance = null; // Limpia la instancia para permitir el remount
+}
 
 function setupPaymentMethodTabs() {
     const methodBtns = document.querySelectorAll('.payment-method-btn');
@@ -141,22 +277,28 @@ function setupPaymentMethodTabs() {
                 panel.classList.toggle('active', panel.id === `${method}-content`);
             });
 
-            // Lógica para cambiar la acción del botón de pago
             if (method === 'billetera') {
                 finalPayBtn.textContent = 'Confirmar Pago';
-                finalPayBtn.removeAttribute('form'); // Desasociar del formulario de tarjeta
-                // Asignamos un nuevo listener que llama a procesarCompra pero sin validación de tarjeta.
+                finalPayBtn.removeAttribute('form');
                 finalPayBtn.onclick = () => procesarCompra(null, 'billetera');
-            } else { // Tarjeta
+                // No destruyas el CardForm ni limpies los divs
+            } else {
                 finalPayBtn.innerHTML = '<ion-icon name="shield-checkmark-outline"></ion-icon> Pagar Ahora';
-                finalPayBtn.onclick = null; // Quitar el listener anterior
-                // Volvemos a asociar el botón al formulario para que el 'submit' funcione.
-                finalPayBtn.setAttribute('form', 'formulario-pago');
+                finalPayBtn.onclick = null;
+                finalPayBtn.setAttribute('form', 'form-checkout');
+                inicializarMercadoPago();
             }
         });
     });
-    // Activar la primera pestaña por defecto al abrir
     methodBtns[0]?.click();
+}
+
+function getTotalPago() {
+    const total = document.getElementById('modal-total-precio');
+    if (total) {
+        return (total.textContent.replace(/[^\d.,]/g, '').replace(',', '.')) || '0.00';
+    }
+    return '0.00';
 }
 
 /**
@@ -250,3 +392,83 @@ function getCsrfToken() {
     const header = document.querySelector("meta[name='_csrf_header']")?.content;
     return { token, header };
 }
+
+// === MODAL MERCADO PAGO ===
+let cardFormInstanceModal = null;
+let mpModalMounted = false;
+document.addEventListener("DOMContentLoaded", () => {
+    const modalMp = document.getElementById('modal-mp');
+    const abrirModalMp = document.getElementById('abrir-modal-mp');
+    const cerrarModalMp = document.getElementById('close-modal-mp');
+    if (abrirModalMp && modalMp && cerrarModalMp) {
+        abrirModalMp.addEventListener('click', () => {
+            if (mpModalMounted) return;
+            mpModalMounted = true;
+            modalMp.style.display = 'block';
+            setTimeout(() => {
+                requestAnimationFrame(() => {
+                    ["form-checkout__cardNumber","form-checkout__expirationDate","form-checkout__securityCode"].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.innerHTML = '';
+                    });
+                    const mp = new MercadoPago("APP_USR-2e01dac0-b3cf-40a1-b358-b86c7586eeeb");
+                    cardFormInstanceModal = mp.cardForm({
+                        amount: "100.00",
+                        iframe: true,
+                        form: {
+                            id: "form-checkout",
+                            cardNumber: { id: "form-checkout__cardNumber", placeholder: "Numero de tarjeta" },
+                            expirationDate: { id: "form-checkout__expirationDate", placeholder: "MM/YY" },
+                            securityCode: { id: "form-checkout__securityCode", placeholder: "Código de seguridad" },
+                            cardholderName: { id: "form-checkout__cardholderName", placeholder: "Titular de la tarjeta" },
+                            issuer: { id: "form-checkout__issuer", placeholder: "Banco emisor" },
+                            installments: { id: "form-checkout__installments", placeholder: "Cuotas" },
+                            identificationType: { id: "form-checkout__identificationType", placeholder: "Tipo de documento" },
+                            identificationNumber: { id: "form-checkout__identificationNumber", placeholder: "Número del documento" },
+                            cardholderEmail: { id: "form-checkout__cardholderEmail", placeholder: "E-mail" },
+                        },
+                        callbacks: {
+                            onFormMounted: error => {
+                                if (error) return console.warn("Form Mounted handling error: ", error);
+                                console.log("Form mounted");
+                            },
+                            onSubmit: event => {
+                                event.preventDefault();
+                                alert('¡Práctica: datos listos para enviar al backend!');
+                            },
+                            onFetching: (resource) => {
+                                const progressBar = document.querySelector(".progress-bar");
+                                progressBar.removeAttribute("value");
+                                return () => {
+                                    progressBar.setAttribute("value", "0");
+                                };
+                            }
+                        },
+                    });
+                });
+            }, 100000); // 700ms para asegurar visibilidad total
+        });
+        cerrarModalMp.addEventListener('click', () => {
+            modalMp.style.display = 'none';
+            document.getElementById('form-checkout').reset();
+            ["form-checkout__cardNumber","form-checkout__expirationDate","form-checkout__securityCode"].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = '';
+            });
+            cardFormInstanceModal = null;
+            mpModalMounted = false;
+        });
+        window.addEventListener('click', (event) => {
+            if (event.target === modalMp) {
+                modalMp.style.display = 'none';
+                document.getElementById('form-checkout').reset();
+                ["form-checkout__cardNumber","form-checkout__expirationDate","form-checkout__securityCode"].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerHTML = '';
+                });
+                cardFormInstanceModal = null;
+                mpModalMounted = false;
+            }
+        });
+    }
+});

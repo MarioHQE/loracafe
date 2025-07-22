@@ -26,6 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setupGeneralReportButton();
     }
+
+    // Eliminar toda la lógica relacionada con categorías de este archivo.
 });
 
 

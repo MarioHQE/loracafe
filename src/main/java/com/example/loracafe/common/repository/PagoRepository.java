@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository;
 
 import com.example.loracafe.common.entity.Pago;
 
-
 @Repository
 public interface PagoRepository extends JpaRepository<Pago, Integer> {
 }
