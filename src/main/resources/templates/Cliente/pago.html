@@ -11,6 +11,8 @@
     <link rel="stylesheet" th:href="@{/assets/cliente/css/EstiloNavbar.css}" />
     <link rel="stylesheet" th:href="@{/assets/cliente/css/EstiloFooter.css}" />
     <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
             background: #f9f7f6;
@@ -151,9 +153,9 @@
                     <input type="text" id="form-checkout__cardholderName" placeholder="Titular de la tarjeta" />
                     <select id="form-checkout__issuer" placeholder="Banco emisor"></select>
                     <select id="form-checkout__installments" placeholder="Cuotas"></select>
-                    <select id="form-checkout__identificationType" placeholder="Tipo de documento"></select>
-                    <input type="text" id="form-checkout__identificationNumber" placeholder="Número del documento" />
-                    <input type="email" id="form-checkout__cardholderEmail" placeholder="E-mail" />
+                    <select id="form-checkout__identificationType" name="identificationType" placeholder="Tipo de documento"></select>
+                    <input type="text" id="form-checkout__identificationNumber" name="identificationNumber" placeholder="Número del documento" required />
+                    <input type="email" id="form-checkout__cardholderEmail" name="cardholderEmail" placeholder="E-mail" required />
                     <button type="submit" id="form-checkout__submit">Confirmar pago</button>
                     <progress value="0" class="progress-bar">Cargando...</progress>
                 </form>
@@ -195,6 +197,12 @@
                 inicializarMercadoPagoConMonto(montoPedido);
             } else {
                 document.getElementById('monto-total-pago').textContent = 'No disponible';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo cargar el pedido.',
+                    confirmButtonColor: '#c00'
+                });
             }
         }
         tabs.forEach(tab => {
@@ -237,8 +245,98 @@
                 },
                 callbacks: {
                     onFormMounted: error => {
-                        if (error) return console.warn("Form Mounted handling error: ", error);
+                        if (error) return Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'No se pudo montar el formulario de pago.',
+                            confirmButtonColor: '#c00'
+                        });
                         console.log("Form mounted");
+                    },
+                    onSubmit: async (event) => {
+                        event.preventDefault();
+                        const data = cardForm.getCardFormData();
+                        // LOG para depuración
+                        console.log("Token:", data.token);
+                        console.log("paymentMethodId:", data.paymentMethodId);
+                        console.log("issuerId:", data.issuerId);
+                        if (!data.cardholderEmail || !data.identificationType || !data.identificationNumber) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Datos incompletos',
+                                text: 'Por favor, completa todos los datos del titular.',
+                                confirmButtonColor: '#c00'
+                            });
+                            return;
+                        }
+                        const pagoRequest = {
+                            pedidoId: pedidoId,
+                            token: data.token,
+                            paymentMethodId: data.paymentMethodId,
+                            issuerId: data.issuerId,
+                            email: data.cardholderEmail,
+                            installments: data.installments,
+                            identificationType: data.identificationType,
+                            identificationNumber: data.identificationNumber
+                        };
+                        const csrf = getCsrfToken();
+                        try {
+                            const response = await fetch('/api/client/pagos/mercadopago', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    [csrf.header]: csrf.token
+                                },
+                                body: JSON.stringify(pagoRequest)
+                            });
+                            if (response.ok) {
+                                const pago = await response.json();
+                                if (pago.status === 'approved') {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: '¡Pago aprobado!',
+                                        text: 'Tu pago fue procesado con éxito.',
+                                        confirmButtonColor: '#8D6E63'
+                                    });
+                                } else if (pago.status === 'in_process') {
+                                    Swal.fire({
+                                        icon: 'info',
+                                        title: 'Pago en proceso',
+                                        text: 'Tu pago está siendo procesado. Te notificaremos cuando se confirme.',
+                                        confirmButtonColor: '#e0cfc2'
+                                    });
+                                } else if (pago.status === 'rejected') {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Pago rechazado',
+                                        text: 'Tu pago fue rechazado. Intenta con otra tarjeta o método.',
+                                        confirmButtonColor: '#c00'
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'Estado desconocido',
+                                        text: 'El estado del pago es: ' + pago.status,
+                                        confirmButtonColor: '#BCAAA4'
+                                    });
+                                }
+                            } else {
+                                const error = await response.text();
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error al procesar el pago',
+                                    text: error,
+                                    confirmButtonColor: '#c00'
+                                });
+                            }
+                        } catch (e) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error de conexión',
+                                text: 'No se pudo conectar con el servidor. Intenta de nuevo.',
+                                confirmButtonColor: '#c00'
+                            });
+                        }
                     },
                     onFetching: (resource) => {
                         const progressBar = document.querySelector(".progress-bar");
@@ -250,41 +348,7 @@
                 },
             });
         }
-        // Montar Mercado Pago con el monto real del pedido
         obtenerPedidoYMostrarTotal();
-        // --- INTEGRACIÓN DEL SUBMIT DEL FORMULARIO ---
-        const form = document.getElementById('form-checkout');
-        form.addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const data = cardForm.getCardFormData();
-            const pagoRequest = {
-                pedidoId: pedidoId,
-                token: data.token,
-                paymentMethodId: data.paymentMethodId,
-                issuerId: data.issuerId,
-                email: data.cardholderEmail,
-                installments: data.installments,
-                identificationType: data.identificationType,
-                identificationNumber: data.identificationNumber
-            };
-            const csrf = getCsrfToken();
-            const response = await fetch('/api/client/pagos/mercadopago', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    [csrf.header]: csrf.token
-                },
-                body: JSON.stringify(pagoRequest)
-            });
-            if (response.ok) {
-                const pago = await response.json();
-                alert('¡Pago realizado con éxito! Estado: ' + pago.status);
-                // window.location.href = '/Cliente/confirmacion?id=' + pedidoId;
-            } else {
-                const error = await response.text();
-                alert('Error al procesar el pago: ' + error);
-            }
-        });
     });
     </script>
 </body>

@@ -178,6 +178,16 @@ public class ClientApiController {
     @PostMapping("/pagos/mercadopago")
     public ResponseEntity<?> procesarPagoMercadoPago(@RequestBody MercadoPagoRequestDto pagoDto,
             Authentication authentication) throws MPApiException {
+        // Log de depuración para ver los datos recibidos
+        System.out.println("--- Datos recibidos en MercadoPagoRequestDto ---");
+        System.out.println("pedidoId: " + pagoDto.getPedidoId());
+        System.out.println("token: " + pagoDto.getToken());
+        System.out.println("paymentMethodId: " + pagoDto.getPaymentMethodId());
+        System.out.println("issuerId: " + pagoDto.getIssuerId());
+        System.out.println("email: " + pagoDto.getEmail());
+        System.out.println("installments: " + pagoDto.getInstallments());
+        System.out.println("identificationType: " + pagoDto.getIdentificationType());
+        System.out.println("identificationNumber: " + pagoDto.getIdentificationNumber());
         Pedido pedido = pedidoService.getPedidoById(pagoDto.getPedidoId().intValue()).orElse(null);
         if (pedido == null) {
             return ResponseEntity.status(404).body("Pedido no encontrado");

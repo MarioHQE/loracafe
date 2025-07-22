@@ -12,6 +12,8 @@
     <script src="https://kit.fontawesome.com/eb344c5846.js" crossorigin="anonymous"></script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <link rel="stylesheet" th:href="@{/assets/cliente/css/EstiloNavbar.css}" />
     <link rel="stylesheet" th:href="@{/assets/cliente/css/Carrito.css}" />
@@ -274,12 +276,22 @@
             btnProcesarPago.addEventListener('click', async () => {
                 const carrito = JSON.parse(localStorage.getItem("productos")) || [];
                 if (carrito.length === 0) {
-                    alert("Tu carrito está vacío.");
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Carrito vacío',
+                        text: 'Tu carrito está vacío.',
+                        confirmButtonColor: '#8D6E63'
+                    });
                     return;
                 }
                 const direccion = document.getElementById('direccion-entrega').value.trim();
                 if (!direccion) {
-                    alert('La dirección de entrega es obligatoria.');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Dirección obligatoria',
+                        text: 'La dirección de entrega es obligatoria.',
+                        confirmButtonColor: '#c00'
+                    });
                     document.getElementById('direccion-entrega').focus();
                     return;
                 }
@@ -305,10 +317,20 @@
                     } else if (response.status === 401 || response.status === 403) {
                         window.location.href = '/login';
                     } else {
-                        alert('No se pudo crear el pedido. Intenta de nuevo.');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'No se pudo crear el pedido. Intenta de nuevo.',
+                            confirmButtonColor: '#c00'
+                        });
                     }
                 } catch (e) {
-                    alert('Error de conexión. Intenta de nuevo.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de conexión',
+                        text: 'No se pudo conectar con el servidor. Intenta de nuevo.',
+                        confirmButtonColor: '#c00'
+                    });
                 }
             });
         }

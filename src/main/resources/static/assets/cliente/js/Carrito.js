@@ -320,14 +320,14 @@ function procesarCompra(event, paymentMethod = 'tarjeta') {
 
     const carrito = JSON.parse(localStorage.getItem("productos")) || [];
     if (carrito.length === 0) {
-        alert("Tu carrito está vacío.");
+        Swal.fire({ icon: 'warning', title: 'Carrito vacío', text: 'Tu carrito está vacío.', confirmButtonColor: '#8D6E63' });
         return;
     }
 
     // El campo de dirección es común y siempre requerido
     const direccion = document.getElementById('direccion').value.trim();
     if (!direccion) {
-        alert("La dirección de entrega es obligatoria.");
+        Swal.fire({ icon: 'warning', title: 'Dirección requerida', text: 'La dirección de entrega es obligatoria.', confirmButtonColor: '#FF9800' });
         document.getElementById('direccion').focus();
         return;
     }
@@ -340,7 +340,7 @@ function procesarCompra(event, paymentMethod = 'tarjeta') {
 
     const csrf = getCsrfToken();
     if (!csrf.token || !csrf.header) {
-        alert("Error de seguridad. Por favor, recargue la página.");
+        Swal.fire({ icon: 'error', title: 'Error de seguridad', text: 'Error de seguridad. Por favor, recargue la página.', confirmButtonColor: '#F44336' });
         return;
     }
 
@@ -361,13 +361,13 @@ function procesarCompra(event, paymentMethod = 'tarjeta') {
         throw new Error('No se pudo procesar tu pedido.');
     })
     .then(pedidoCreado => {
-        alert(`¡Compra realizada con éxito! Tu pedido es el #${pedidoCreado.id}.`);
+        Swal.fire({ icon: 'success', title: 'Compra realizada', text: `¡Compra realizada con éxito! Tu pedido es el #${pedidoCreado.id}.`, confirmButtonColor: '#4CAF50' });
         localStorage.removeItem("productos");
         cerrarModalPago();
         cargarCarrito();
     })
     .catch(error => {
-        alert(error.message);
+        Swal.fire({ icon: 'error', title: 'Error', text: error.message, confirmButtonColor: '#F44336' });
     });
 }
 
@@ -378,7 +378,7 @@ function validarFormularioTarjeta() {
     const camposRequeridos = document.querySelectorAll('#formulario-pago input[required]');
     for (const campo of camposRequeridos) {
         if (!campo.value.trim()) {
-            alert(`El campo "${campo.placeholder || campo.id}" es obligatorio.`);
+            Swal.fire({ icon: 'warning', title: 'Campo requerido', text: `El campo "${campo.placeholder || campo.id}" es obligatorio.`, confirmButtonColor: '#FF9800' });
             campo.focus();
             return false;
         }
@@ -472,3 +472,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+// SweetAlert2 global
+if (typeof Swal === 'undefined') {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css';
+    document.head.appendChild(link);
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+    document.head.appendChild(script);
+}
