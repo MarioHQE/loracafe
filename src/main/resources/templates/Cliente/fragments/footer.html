@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+    <!-- th:fragment="footer" permite que este bloque sea reutilizado en otras páginas -->
+    <footer th:fragment="footer" class="site-footer">
+        <div class="footer-container">
+            <div class="footer-about">
+                <h4>Sobre Lora Café</h4>
+                <p>
+                    Una cafetería 100% peruana dedicada a ofrecerte el mejor café de la región en un ambiente
+                    acogedor. Ven y disfruta de un tiempo bien pasado con nosotros.
+                </p>
+                <div class="footer-social">
+                    <a href="https://www.facebook.com/share/ctLabiRs8VnH2tCH/?mibextid=qi20mg" class="social-icon"><ion-icon name="logo-facebook"></ion-icon></a>
+                    <a href="https://www.instagram.com/loracafe.ica?igsh=bGkwN3locXhpMWZw" class="social-icon"><ion-icon name="logo-instagram"></ion-icon></a>
+                    <a href="https://l.instagram.com/?u=https%3A%2F%2Fwa.link%2Foomk5g&e=AT10FzF9cbchi_VQ_RF7ArFOdT0GMtS-p4ovBUU8RL1OLmGIzX-8jLJnzfEH_z3D9GC9MBHTIEbFcJWP8pqWQrphw4wdhbWM_XxHnw" class="social-icon"><ion-icon name="logo-whatsapp"></ion-icon></a>
+                </div>
+            </div>
+
+            <div class="footer-links">
+                <h4>Navegación</h4>
+                <ul>
+                    <li><a th:href="@{/inicio}">Inicio</a></li>
+                    <li><a th:href="@{/carta}">Carta</a></li>
+                    <li><a th:href="@{/sobrenosotros}">Sobre Nosotros</a></li>
+                    <li><a th:href="@{/login}">Mi Cuenta</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-contact">
+                <h4>Contacto</h4>
+                <ul>
+                    <li><ion-icon name="location-outline"></ion-icon> <span>Calle Lima 135, Ica, Perú</span></li>
+                    <li><ion-icon name="call-outline"></ion-icon> <span>+51 998 342 524</span></li>
+                    <li><ion-icon name="mail-outline"></ion-icon> <span>contacto@loracafe.com</span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 Lora Café. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

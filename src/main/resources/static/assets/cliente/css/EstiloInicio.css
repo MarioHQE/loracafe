@@ -320,7 +320,7 @@ html {
   background-image: linear-gradient(
     rgba(0,0,0,0.7),
     rgba(0,0,0,0.7)),
-    url(../../Vista/Imagenes/img-inicio/servicios2.jpg);
+    url(/img/img-inicio/servicios2.jpg);
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -631,7 +631,19 @@ html {
   margin-left: -100px; /* Mueve a la izquierda */
   border-radius: 10vh;
 }
-
+.promocion .add-promo-to-cart-btn {
+  background-color: #e97624;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  width: 100%;
+}
+.promocion .add-promo-to-cart-btn:hover {
+  background-color: #c05d05;
+}
 @media (max-width: 768px) {
   .carousel {
     display: flex;

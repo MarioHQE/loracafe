@@ -1,145 +1,172 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Carrito</title>
-    <script src="https://kit.fontawesome.com/eb344c5846.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="../../Vista/Estilos/EstiloNavbar.css" />
-    <link rel="stylesheet" href="../../Vista/Estilos/Carrito.css" />
+    <title>Carrito de Compras - Lora Café</title>
+    <!-- Metatags CSRF para el formulario de pago -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     
+    <script src="https://kit.fontawesome.com/eb344c5846.js" crossorigin="anonymous"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    
+    <link rel="stylesheet" th:href="@{/assets/cliente/css/EstiloNavbar.css}" />
+    <link rel="stylesheet" th:href="@{/assets/cliente/css/Carrito.css}" />
+    <link rel="stylesheet" th:href="@{/assets/cliente/css/EstiloFooter.css}" />
 </head>
 
 <body>
-    <nav>
-        
-        <input type="checkbox" id="check" />
-        
-        <label for="check" class="checkbtn">
-            <i class="fas fa-bars"></i>
-        </label>
-        
-        <a href="../inicio.html" class="enlace">
-            <img src="../../Vista/Imagenes/img-inicio/LOGO.jpeg" alt="" class="logo" />
-        </a>
+    <div th:replace="~{Cliente/fragments/navbar :: navbar}"></div>
 
-        
-        <ul>
-            <li><a href="../inicio.html">Inicio</a></li>
-            <li><a href="sobrenosotros.html">Sobre Nosotros</a></li>
-            <li><a href="carta.html">Carta</a></li>
-            <li><a href="login.html">Iniciar Sesión</a></li>
-            <li><a href="carrito.html" id="cart"><img src="../../Vista/Imagenes/img-carta/shopping-cart.png" alt=""><span id="cuenta-carrito">0</span></a></li>
-        </ul>
-    </nav>
+    <main class="cart-page-container">
+        <h1 class="cart-title">Tu Carrito de Compras</h1>
 
-    <main>
-        <!-- Título centrado sobre el contenido del carrito -->
-        <h1 id="titulo-carrito">Carrito</h1>
+        <div class="cart-layout">
+            <!-- Columna izquierda: Tabla de productos -->
+            <div class="cart-items-column">
+                <table class="cart-table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                            <th></th> <!-- Columna para el botón de eliminar -->
+                        </tr>
+                    </thead>
+                    <tbody id="carrito-contenido">
+                        <!-- JS llenará esta sección -->
+                    </tbody>
+                </table>
+                <div id="empty-cart-message" style="display: none; text-align: center; padding: 40px;">
+                    <p>¡Tu carrito está vacío!</p>
+                    <a th:href="@{/carta}" class="btn-primary">Volver a la Carta</a>
+                </div>
+            </div>
 
-        <section id="carrito-contenido">
-            <!-- Productos cargados dinámicamente -->
-        </section>
-
-        <div id="carrito-resumen" style="display: none">
-            <p>Total unidades: <span id="total-unidades">0</span></p>
-            <p>Total precio: S/<span id="total-precio">0.00</span></p>
-            <button id="comprar-btn">Comprar</button>
-            <button id="reiniciar-btn">Reiniciar</button>
+            <!-- Columna derecha: Resumen de la compra -->
+            <div class="cart-summary-column" id="carrito-resumen" style="display: none;">
+                <div class="summary-card">
+                    <h3>Resumen del Pedido</h3>
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span id="subtotal-precio">S/ 0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Envío:</span>
+                        <span>A calcular</span>
+                    </div>
+                    <div class="summary-divider"></div>
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span id="total-precio">S/ 0.00</span>
+                    </div>
+                    <button id="comprar-btn" class="btn-primary btn-checkout">Proceder al Pago</button>
+                    <button id="reiniciar-btn" class="btn-secondary">Vaciar Carrito</button>
+                </div>
+            </div>
         </div>
-        <!-- Modal de confirmación -->
-        <!-- Modal de pago -->
-        <div id="modal-pago" class="modal">
-            <div class="modal-contenido">
-                <span id="cerrar-modal" class="close">&times;</span>
-                <!-- Formulario de facturación y pago -->
-                <div class="container">
-                    <form action="" id="formulario-pago">
-                        <div class="row">
-                            <div class="column">
-                                <h3 class="title">DIRECCIÓN DE FACTURACIÓN</h3>
-                                <div class="input-box">
-                                    <span>Nombre completo :</span>
-                                    <input type="text" id="nombre" placeholder="Nombres" required />
-                                </div>
-                                <div class="input-box">
-                                    <span>Correo electrónico :</span>
-                                    <input type="email" id="email" placeholder="ejemplo@gmail.com" required />
-                                </div>
-                                <div class="input-box">
-                                    <span>Dirección :</span>
-                                    <input type="text" id="direccion" placeholder="Distrito - Calle" required />
-                                </div>
-                                <div class="input-box">
-                                    <span>Ciudad :</span>
-                                    <input type="text" id="ciudad" placeholder="Ciudad" required />
-                                </div>
-                                <div class="flex">
-                                    <div class="input-box">
-                                        <span>País :</span>
-                                        <input type="text" id="pais" placeholder="País" required />
-                                    </div>
-                                    <div class="input-box">
-                                        <span>Código postal :</span>
-                                        <input type="number" id="codigo-postal" placeholder="123 456" required />
-                                    </div>
+        
+        <!-- ====================================================== -->
+<!--         NUEVO MODAL DE PAGO - VERSIÓN PROFESIONAL      -->
+<!-- ====================================================== -->
+<div id="modal-pago" class="modal">
+    <div class="modal-contenido">
+        <div class="modal-header">
+            <h3>Finalizar Compra</h3>
+            <span id="cerrar-modal" class="close">×</span>
+        </div>
+
+        <div class="modal-body">
+            <!-- Pestañas para seleccionar el método de pago -->
+            <div class="payment-methods">
+                <button class="payment-method-btn active" data-method="tarjeta">
+                    <ion-icon name="card-outline"></ion-icon> Tarjeta de Crédito/Débito
+                </button>
+                <button class="payment-method-btn" data-method="billetera">
+                    <ion-icon name="phone-portrait-outline"></ion-icon> Billetera Móvil (Yape/Plin)
+                </button>
+            </div>
+
+            <!-- Contenido que cambia según la pestaña seleccionada -->
+            <div class="payment-content">
+
+                <!-- SECCIÓN TARJETA (Visible por defecto) -->
+                <div id="tarjeta-content" class="payment-panel active">
+                    <form id="formulario-pago">
+                        <div class="form-section">
+                            <h4>1. Información de Contacto y Envío</h4>
+                            <div class="input-box">
+                                <label for="email">Correo electrónico</label>
+                                <input type="email" id="email" placeholder="ejemplo@gmail.com" required />
+                            </div>
+                            <div class="input-box">
+                                <label for="direccion">Dirección de Entrega</label>
+                                <input type="text" id="direccion" placeholder="Av. Principal 123, Distrito" required />
+                            </div>
+                        </div>
+
+                        <hr class="divider">
+
+                        <div class="form-section">
+                            <h4>2. Detalles de la Tarjeta</h4>
+                            <div class="input-box">
+                                <label for="numero-tarjeta">Número de tarjeta</label>
+                                <div class="input-with-icon">
+                                    <input type="text" id="numero-tarjeta" placeholder="0000 0000 0000 0000" required pattern="\d{16}" title="Debe tener 16 dígitos" />
+                                    <ion-icon name="card-outline" class="input-icon"></ion-icon>
                                 </div>
                             </div>
-
-                            <div class="column">
-                                <h3 class="title">PAGO</h3>
+                            <div class="input-group">
                                 <div class="input-box">
-                                    <span>Tarjetas aceptadas :</span>
-                                    <img src="../../Vista/Imagenes/img-pago/imgcards.png" alt="" />
+                                    <label for="fecha-expiracion-mes">Expira (MM/AA)</label>
+                                    <div class="expiry-group">
+                                        <input type="text" id="fecha-expiracion-mes" placeholder="MM" required pattern="\d{2}" title="Mes (01-12)">
+                                        <span>/</span>
+                                        <input type="text" id="fecha-expiracion-ano" placeholder="AA" required pattern="\d{2}" title="Año (ej. 25)">
+                                    </div>
                                 </div>
                                 <div class="input-box">
-                                    <span>Nombre en la tarjeta :</span>
-                                    <input type="text" id="nombre-tarjeta" placeholder="Nombres" required />
-                                </div>
-                                <div class="input-box">
-                                    <span>Número de tarjeta :</span>
-                                    <input type="number" id="numero-tarjeta" placeholder="0000 0000 0000 0000" required
-                                        pattern="\d{16}" title="El número de tarjeta debe tener 16 dígitos" />
-                                </div>
-                                <div class="input-box">
-                                    <label for="fecha-expiracion">Fecha de expiración:</label>
-                                    <input type="date" id="fecha-expiracion" name="fecha-expiracion" required />
-
-                                    <div class="input-box">
-                                        <span>CVV :</span>
-                                        <input type="number" id="cvv" placeholder="123" required pattern="\d{3}"
-                                            title="El CVV debe tener 3 dígitos" />
+                                    <label for="cvv">CVV</label>
+                                    <div class="input-with-icon">
+                                        <input type="text" id="cvv" placeholder="123" required pattern="\d{3}" title="Debe tener 3 dígitos" />
+                                        <ion-icon name="help-circle-outline" class="input-icon" title="Los 3 dígitos en la parte posterior de su tarjeta"></ion-icon>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <button type="submit" class="btn" id="finalizar-pago-btn">
-                            Pagar
-                        </button>
                     </form>
+                </div>
+
+                <!-- SECCIÓN BILLETERA MÓVIL (Oculta por defecto) -->
+                <div id="billetera-content" class="payment-panel">
+                    <div class="qr-code-container">
+                        <h4>Escanea para Pagar con Yape o Plin</h4>
+                        <img th:src="@{/img/img-pago/pago_qr.jpg}" alt="Código QR de pago" class="qr-code-img">
+                        <p>Una vez realizado el pago, haz clic en "Confirmar Pago" para finalizar tu pedido.</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </main>
-    <footer style="background-color: #5c5858; color: white; text-align: center; padding: 10px 0; margin-top: 900px">
-      <p>&copy; 2024 Lora Café. Todos los derechos reservados.</p>
-      <p>Síguenos en redes sociales: </p>
-      <i class="fa-brands fa-facebook" style= "color: rgb(255, 255, 255); font-size: 24px; margin-right: 15px;"></i>
-    </a> 
-      <a href="https://www.instagram.com/loracafe.ica?igsh=bGkwN3locXhpMWZw">
-        <i class="fa-brands fa-instagram" style="color: rgb(255, 255, 255);font-size: 24px; margin-right: 15px;"></i>
-      </a>
-      <a href="https://l.instagram.com/?u=https%3A%2F%2Fwa.link%2Foomk5g&e=AT10FzF9cbchi_VQ_RF7ArFOdT0GMtS-p4ovBUU8RL1OLmGIzX-8jLJnzfEH_z3D9GC9MBHTIEbFcJWP8pqWQrphw4wdhbWM_XxHnw">
-        <i class="fa-brands fa-whatsapp" style="color: rgb(255, 255, 255);font-size: 24px; margin-right: 15px;"></i>
-      </a>
-              
-  </footer>
-    
-    <script src="../../Controlador/JavaScript/Carta.js"></script>
-    <script src="../../Controlador/JavaScript/Carrito.js"></script>
-    <script src="../../Controlador/JavaScript/Navbar.js"></script>
-</body>
 
+        <div class="modal-footer">
+            <div class="total-summary">
+                <span>Total a Pagar:</span>
+                <strong id="modal-total-precio">S/ 0.00</strong>
+            </div>
+            <button type="submit" form="formulario-pago" class="btn-pay-final">
+                <ion-icon name="shield-checkmark-outline"></ion-icon> Pagar Ahora
+            </button>
+        </div>
+    </div>
+</div>
+
+    </main>
+    <div th:replace="~{Cliente/fragments/footer :: footer}"></div>
+    
+    <script th:src="@{/assets/cliente/js/Carrito.js}"></script>
+    <script th:src="@{/assets/cliente/js/Navbar.js}"></script>
+</body>
 </html>

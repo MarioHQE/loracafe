@@ -1,7 +1,7 @@
 package com.example.loracafe.dashboard.controller;
 
-import com.example.loracafe.dashboard.entity.Usuario;
-import com.example.loracafe.dashboard.service.UsuarioService;
+import com.example.loracafe.common.entity.Usuario;
+import com.example.loracafe.common.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/dashboard/users")
 public class UserRestController {
 
     @Autowired

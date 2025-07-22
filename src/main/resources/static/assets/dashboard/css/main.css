@@ -1,3 +1,8 @@
+/* ====================================================== */
+/* ===         Estilo Principal del Dashboard         === */
+/* ====================================================== */
+
+/* --- Variables Globales de Diseño --- */
 :root {
     --sidebar-width: 260px;
     --header-height: 70px;
@@ -19,6 +24,7 @@
     --card-bg: #ffffff;
 }
 
+/* --- Reset Básico y Estilos Globales --- */
 * {
     margin: 0;
     padding: 0;
@@ -38,7 +44,7 @@ body {
     min-height: 100vh;
 }
 
-/* Sidebar Styles */
+/* --- Estilos de la Barra Lateral (Sidebar) --- */
 .sidebar {
     width: var(--sidebar-width);
     background: linear-gradient(180deg, var(--primary-dark), var(--primary-color));
@@ -73,6 +79,7 @@ body {
     font-size: 1.8rem;
 }
 
+/* --- Estilos del Menú Lateral (CORREGIDOS) --- */
 .menu-items {
     padding: 25px 0;
 }
@@ -86,20 +93,35 @@ body {
     transition: var(--transition);
     border-left: 4px solid transparent;
     font-size: 1.05rem;
+    color: #D7CCC8;
+    text-decoration: none;
 }
 
-.menu-item:hover, .menu-item.active {
+.menu-item:hover,
+.menu-item.active {
     background: rgba(255, 255, 255, 0.08);
-    border-left: 4px solid var(--accent-color);
+    border-left-color: var(--accent-color);
+    color: #FFFFFF;
 }
 
 .menu-item i {
     width: 24px;
     text-align: center;
     font-size: 1.2rem;
+    color: var(--accent-color);
+    transition: color 0.3s ease;
 }
 
-/* Main Content Styles */
+.menu-item:hover i,
+.menu-item.active i {
+    color: #FFFFFF;
+}
+
+.menu-item span {
+    font-weight: 500;
+}
+
+/* --- Estilos del Contenido Principal --- */
 .main-content {
     flex: 1;
     margin-left: var(--sidebar-width);
@@ -129,9 +151,6 @@ body {
     font-weight: 600;
     color: var(--primary-color);
     font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 12px;
 }
 
 .header-right {
@@ -167,7 +186,6 @@ body {
     top: 50%;
     transform: translateY(-50%);
     color: #777;
-    font-size: 1.1rem;
 }
 
 .notification-bell {
@@ -197,14 +215,6 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    cursor: pointer;
-    padding: 8px 15px;
-    border-radius: 30px;
-    transition: var(--transition);
-}
-
-.user-profile:hover {
-    background: #f5f5f5;
 }
 
 .user-profile img {
@@ -258,6 +268,7 @@ body {
     border-radius: 2px;
 }
 
+/* --- Estilos de Botones --- */
 .btn {
     padding: 12px 24px;
     border-radius: var(--radius);
@@ -272,11 +283,6 @@ body {
     box-shadow: var(--shadow);
 }
 
-.btn-sm {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-}
-
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     color: white;
@@ -287,27 +293,7 @@ body {
     box-shadow: 0 6px 12px rgba(93, 64, 55, 0.25);
 }
 
-.btn-success {
-    background: var(--success-color);
-    color: white;
-}
-
-.btn-info {
-    background: var(--info-color);
-    color: white;
-}
-
-.btn-warning {
-    background: var(--warning-color);
-    color: white;
-}
-
-.btn-danger {
-    background: var(--danger-color);
-    color: white;
-}
-
-/* Dashboard Cards */
+/* --- Estilos de Tarjetas (Cards) --- */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -324,7 +310,6 @@ body {
     align-items: center;
     gap: 20px;
     transition: var(--transition);
-    border-top: 4px solid transparent;
 }
 
 .stat-card:hover {
@@ -373,31 +358,13 @@ body {
     font-size: 1rem;
 }
 
-.stat-trend {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.9rem;
-    margin-top: 5px;
-    color: var(--success-color);
-}
-
-.stat-trend.down {
-    color: var(--danger-color);
-}
-
-/* Table Styles */
+/* --- Estilos de Tablas --- */
 .card {
     background: var(--card-bg);
     border-radius: var(--radius);
     box-shadow: var(--shadow-lg);
     margin-bottom: 35px;
     overflow: hidden;
-    transition: var(--transition);
-}
-
-.card:hover {
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
 }
 
 .card-header {
@@ -425,7 +392,8 @@ table {
     border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
     padding: 15px 20px;
     text-align: left;
     border-bottom: 1px solid #eee;
@@ -447,34 +415,38 @@ tr:hover {
     font-size: 0.85rem;
     font-weight: 500;
     display: inline-block;
+    text-transform: capitalize;
 }
 
-.status.completed {
+.status.completed,
+.status.activo {
     background: rgba(76, 175, 80, 0.15);
     color: var(--success-color);
 }
 
-.status.pending {
+.status.pending,
+.status.pendiente {
     background: rgba(255, 152, 0, 0.15);
     color: var(--warning-color);
 }
 
-.status.cancelled {
+.status.cancelled,
+.status.cancelado,
+.status.inactivo {
     background: rgba(244, 67, 54, 0.15);
     color: var(--danger-color);
 }
 
-.status.processing {
+.status.processing,
+.status.en-proceso,
+.status.nuevo {
     background: rgba(33, 150, 243, 0.15);
     color: var(--info-color);
 }
 
-.status.new {
-    background: rgba(33, 150, 243, 0.15);
-    color: var(--info-color);
-}
-
-.status.read {
+.status.read,
+.status.leido,
+.status.respondido {
     background: rgba(158, 158, 158, 0.15);
     color: #9e9e9e;
 }
@@ -484,12 +456,10 @@ tr:hover {
     border-radius: var(--radius);
     border: none;
     cursor: pointer;
-    font-size: 0.9rem;
     display: inline-flex;
     align-items: center;
     gap: 5px;
     transition: var(--transition);
-    font-weight: 500;
 }
 
 .action-btn.view {
@@ -507,17 +477,47 @@ tr:hover {
     color: var(--danger-color);
 }
 
-.action-btn.reply {
-    background: rgba(76, 175, 80, 0.15);
-    color: var(--success-color);
-}
-
 .action-btn:hover {
     opacity: 0.9;
     transform: translateY(-2px);
 }
 
-/* Form Styles */
+/* --- Estilos Específicos para Tablas del Dashboard --- */
+#products-table .product-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+#products-table td {
+    vertical-align: middle;
+}
+
+#products-table th:nth-child(4),
+#products-table td:nth-child(4) {
+    min-width: 250px;
+}
+
+#products-table th:nth-child(5),
+#products-table td:nth-child(5) {
+    width: 120px;
+    white-space: nowrap;
+}
+
+#products-table th:nth-child(6),
+#products-table td:nth-child(6) {
+    width: 80px;
+    text-align: center;
+}
+
+#products-table th:nth-child(7),
+#products-table td:nth-child(7) {
+    width: 140px;
+    text-align: center;
+}
+
+/* --- Estilos de Formularios y Modales --- */
 .form-group {
     margin-bottom: 25px;
 }
@@ -557,23 +557,6 @@ textarea.form-control {
     gap: 25px;
 }
 
-.grid-3 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 25px;
-}
-
-.preview-image {
-    width: 120px;
-    height: 120px;
-    border-radius: var(--radius);
-    object-fit: cover;
-    border: 1px dashed #ddd;
-    display: block;
-    margin-top: 15px;
-}
-
-/* Modal */
 .modal {
     position: fixed;
     top: 0;
@@ -581,18 +564,14 @@ textarea.form-control {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: var(--transition);
 }
 
 .modal.active {
-    opacity: 1;
-    visibility: visible;
+    display: flex;
 }
 
 .modal-content {
@@ -602,25 +581,15 @@ textarea.form-control {
     max-width: 700px;
     max-height: 90vh;
     overflow-y: auto;
-    transform: translateY(-50px);
-    transition: var(--transition);
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-}
-
-.modal.active .modal-content {
-    transform: translateY(0);
 }
 
 .modal-header {
     padding: 22px 30px;
     border-bottom: 1px solid #eee;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    background: var(--card-bg);
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    align-items: center;
 }
 
 .modal-header h3 {
@@ -649,20 +618,13 @@ textarea.form-control {
     cursor: pointer;
     color: #777;
     transition: var(--transition);
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
 }
 
 .close-modal:hover {
-    background: #f5f5f5;
     color: var(--danger-color);
 }
 
-/* Chart Container */
+/* --- Estilos de Gráficos (Charts) --- */
 .chart-container {
     background: var(--card-bg);
     border-radius: var(--radius);
@@ -683,14 +645,90 @@ textarea.form-control {
     position: relative;
 }
 
-/* Report Cards */
+/* --- Estilos de Filtros --- */
+.filters {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.filters select,
+.filters input {
+    padding: 10px 15px;
+    border-radius: var(--radius);
+    border: 1px solid #ddd;
+    background: #f9f9f9;
+}
+
+/* =================================== */
+/* Estilos para Controles de Paginación*/
+/* =================================== */
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    /* Alinea los controles a la derecha de la tarjeta */
+    align-items: center;
+    gap: 10px;
+    /* Espacio entre los elementos */
+    padding: 20px 30px;
+    /* Espaciado interno */
+    border-top: 1px solid #eee;
+    /* Línea separadora */
+    margin-top: -35px;
+    /* Compensa el margin-bottom de la .card para que se pegue abajo */
+}
+
+.pagination-controls button {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    color: var(--primary-color);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+    background-color: var(--light-color);
+    border-color: #ccc;
+    transform: translateY(-1px);
+}
+
+.pagination-controls button:disabled {
+    color: #aaa;
+    cursor: not-allowed;
+    background-color: #f9f9f9;
+}
+
+.pagination-controls span {
+    font-size: 0.9rem;
+    color: #555;
+    font-weight: 500;
+}
+
+/* =================================== */
+/* Estilos para la Página de Reportes  */
+/* =================================== */
+
+.report-card-grid {
+    display: grid;
+    /* Crea columnas que se adaptan al espacio, con un mínimo de 300px */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    /* Espacio entre las tarjetas */
+}
+
 .report-card {
     background: var(--card-bg);
     border-radius: var(--radius);
-    padding: 25px;
+    padding: 30px;
     box-shadow: var(--shadow-lg);
     text-align: center;
-    transition: var(--transition);
+    transition: all 0.3s ease;
+
+    /* Usamos Flexbox para alinear el contenido verticalmente */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -698,96 +736,118 @@ textarea.form-control {
 
 .report-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    /* Efecto de "levantar" la tarjeta */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
-.report-card i {
+.report-card-icon {
     font-size: 3rem;
     color: var(--primary-color);
     margin-bottom: 20px;
+    /* Contenedor para el icono */
+    width: 80px;
+    height: 80px;
+    background-color: #f5f7fa;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .report-card h4 {
     font-size: 1.4rem;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     color: var(--primary-color);
+    font-weight: 600;
 }
 
 .report-card p {
     color: #777;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     flex-grow: 1;
+    /* Hace que el párrafo ocupe el espacio disponible, empujando el botón hacia abajo */
 }
 
-/* Toggle Switch */
-.toggle-switch {
+.report-card .btn {
+    width: 80%;
+    /* Ancho del botón dentro de la tarjeta */
+    margin-top: auto;
+    /* Empuja el botón al final de la tarjeta */
+}
+
+/* --- Estilos para el Dropdown de Notificaciones --- */
+.notification-bell {
     position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
 }
 
-.toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.toggle-slider {
-    position: absolute;
+#notification-button {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    color: var(--primary-color);
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 34px;
+    position: relative;
 }
 
-.toggle-slider:before {
+.notification-dropdown {
+    display: none;
     position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-}
-
-input:checked + .toggle-slider {
-    background-color: var(--success-color);
-}
-
-input:checked + .toggle-slider:before {
-    transform: translateX(26px);
-}
-
-/* Filters */
-.filters {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
-
-.filters select, .filters input {
-    padding: 10px 15px;
+    top: 120%;
+    right: 0;
+    width: 320px;
+    background-color: var(--card-bg);
+    box-shadow: var(--shadow-lg);
     border-radius: var(--radius);
-    border: 1px solid #ddd;
-    background: #f9f9f9;
+    overflow: hidden;
+    animation: fadeIn 0.2s;
 }
 
-.date-range {
+.notification-dropdown.active {
+    display: block;
+}
+
+.notification-header {
+    padding: 15px;
+    font-weight: 600;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+}
+
+.notification-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-item {
     display: flex;
-    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
     gap: 15px;
+    text-decoration: none;
+    color: var(--text-dark);
+    transition: background-color 0.2s;
 }
 
-.date-range input {
-    padding: 10px 15px;
-    border-radius: var(--radius);
-    border: 1px solid #ddd;
-    background: #f9f9f9;
+.notification-item:hover {
+    background-color: #f5f7fa;
+}
+
+.notification-item i {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+}
+
+.notification-item-content p {
+    margin: 0;
+    font-weight: 500;
+}
+
+.notification-item-content small {
+    color: #888;
+}
+
+.no-notifications {
+    padding: 40px 15px;
+    text-align: center;
+    color: #888;
 }

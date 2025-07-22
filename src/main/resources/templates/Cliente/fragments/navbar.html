@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+
+    <!-- th:fragment="navbar" permite que este bloque sea reutilizado -->
+    <header th:fragment="navbar" class="site-header">
+        <div class="header-container">
+            <!-- Logo a la izquierda -->
+            <a th:href="@{/inicio}" class="header-logo">
+                <img th:src="@{/img/img-inicio/LOGO.jpeg}" alt="Lora Café Logo">
+            </a>
+
+            <!-- Navegación principal en el centro -->
+            <nav class="main-nav">
+                <a th:href="@{/inicio}" class="nav-link">Inicio</a>
+                <a th:href="@{/carta}" class="nav-link">Carta</a>
+                <a th:href="@{/sobrenosotros}" class="nav-link">Sobre Nosotros</a>
+            </nav>
+
+            <!-- Acciones a la derecha -->
+            <div class="header-actions">
+                <!-- Carrito -->
+                <a th:href="@{/carrito}" class="action-icon cart-icon">
+                    <ion-icon name="cart-outline"></ion-icon>
+                    <span id="cuenta-carrito" class="cart-badge">0</span>
+                </a>
+
+                <!-- LÓGICA DE AUTENTICACIÓN CON ICONOS -->
+                
+                <!-- Icono de Login (si el usuario es anónimo) -->
+                <a th:href="@{/login}" class="action-icon" sec:authorize="isAnonymous()">
+                    <ion-icon name="person-circle-outline"></ion-icon>
+                </a>
+
+                <!-- Menú de Usuario (si el usuario ha iniciado sesión) -->
+                <div class="user-menu" sec:authorize="isAuthenticated()">
+                    <span class="user-name" th:text="${usuarioLogueado != null ? usuarioLogueado.nombre : ''}"></span>
+                    <button class="action-icon user-menu-button">
+                        <ion-icon name="settings-outline"></ion-icon>
+                    </button>
+                    <div class="user-menu-dropdown">
+                        <a th:href="@{/mi-cuenta}" class="dropdown-item">Mi Cuenta</a>
+                        <!-- Opción para ir al Dashboard si el usuario es ADMIN -->
+                        <a th:href="@{/dashboard}" class="dropdown-item" sec:authorize="hasRole('ADMIN')">Dashboard</a>
+                        <div class="dropdown-divider"></div>
+                        <!-- Formulario de Logout -->
+                        <form th:action="@{/logout}" method="post">
+                             <button type="submit" class="dropdown-item logout">Cerrar Sesión</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botón para menú móvil (hamburguesa) -->
+            <button class="mobile-menu-toggle">
+                <ion-icon name="menu-outline"></ion-icon>
+            </button>
+        </div>
+        
+        <!-- Menú desplegable para móviles -->
+        <div class="mobile-nav">
+             <a th:href="@{/inicio}" class="nav-link">Inicio</a>
+             <a th:href="@{/carta}" class="nav-link">Carta</a>
+             <a th:href="@{/sobrenosotros}" class="nav-link">Sobre Nosotros</a>
+             <!-- Aquí también podríamos añadir los enlaces de login/logout si quisiéramos -->
+        </div>
+    </header>
+
+</body>
+</html>

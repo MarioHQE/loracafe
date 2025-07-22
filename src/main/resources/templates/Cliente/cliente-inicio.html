@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inicio Lora Cafe</title>
+    <!-- Rutas corregidas con Thymeleaf -->
+    <link rel="stylesheet" type="text/css" th:href="@{/assets/cliente/css/EstiloInicio.css}" />
+    <link rel="stylesheet" th:href="@{/assets/cliente/css/EstiloNavbar.css}" />
+    <link rel="stylesheet" th:href="@{/assets/cliente/css/EstiloFooter.css}" />
+    
+    <script src="https://kit.fontawesome.com/eb344c5846.js" crossorigin="anonymous"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body>
+    <!-- ========= NAVBAR (REUTILIZABLE) ========= -->
+    <!-- Incluimos un fragmento de Navbar para no repetir código -->
+    <div th:replace="~{Cliente/fragments/navbar :: navbar}"></div>
+
+    <!-- ========= HEADER ========= -->
+    <header class="header">
+        <div class="carousel">
+            <button class="carousel-prev">←</button>
+            <button class="carousel-next">→</button>
+            <div class="carousel-slide">
+                <!-- Slider 1 -->
+                <div class="carousel-item">
+                    <div class="text">
+                        <h1>Bienvenido a Lora Café</h1>
+                        <p>CAFETERÍA 100 % PERUANA, Ofrece bebidas frías y calientes, sanguches, pasteles dulces y salados, donas en un ambiente agradable con aire acondicionado y wifi. #eltiempobienpasado.</p>
+                    </div>
+                    <div class="image-uno">
+                        <img th:src="@{/img/img-inicio/fondocafechido.jpg}" alt="Fondo 1">
+                    </div>
+                </div>
+                <!-- Slider 2 -->
+                <div class="carousel-item">
+                    <div class="text">
+                        <h1>Disfruta de Nuestros Combos en Lora Café</h1>
+                        <p>Descubre nuestros combos, creados para ofrecerte lo mejor en sabor y calidad. ¡No te los pierdas!</p>
+                        <a href="#combos-section" class="btn-1">Ver Combos</a>
+                    </div>
+                    <div class="image-combos">
+                        <img th:src="@{/img/img-inicio/comboini.jpeg}" alt="Fondo 2">
+                    </div>
+                </div>
+                <!-- Slider 3 -->
+                <div class="carousel-item">
+                    <div class="text-servicios">
+                        <h1>Conoce los servicios que tenemos en Lora Café</h1>
+                        <p>Disfruta de nuestros servicios en nuestro local. ¡Te Esperamos!</p>
+                        <a href="#servicios-section" class="btn-1">Ver servicios</a>
+                    </div>
+                    <div class="image-services">
+                        <img th:src="@{/img/img-inicio/sserviciosfinal.jpg}" alt="Fondo 3">
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="text">
+                        <h1>Conoce Nuestras Promociones!!!</h1>
+                        <p>Ven y disfruta de estas promociones que hemos preparado para ti.</p>
+                        <a href="#promos-section" class="btn-1">Ver Promociones</a>
+                    </div>
+                    <div class="image-promos">
+                        <img th:src="@{/img/img-inicio/nuevofondo2.jpg}" alt="Fondo 4">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========= SECCIONES ESTÁTICAS ========= -->
+    <section class="coffee" id="combos-section">
+        <div class="coffee-content container">
+            <h2>NUESTROS COMBOS</h2>
+            <p>En Lora Café hemos creado los combos perfectos para que disfrutes al máximo...</p>
+        </div>
+        <div class="container-all">
+            <input type="radio" id="1" name="image-slide" hidden />
+            <input type="radio" id="2" name="image-slide" hidden />
+            <input type="radio" id="3" name="image-slide" hidden />
+            <div class="slide">
+                <div class="item-slide"><img th:src="@{/img/img-inicio/Slider1.jpg}"></div>
+                <div class="item-slide"><img th:src="@{/img/img-inicio/Slider2.jpg}"></div>
+                <div class="item-slide"><img th:src="@{/img/img-inicio/Slider3.jpg}"></div>
+            </div>
+            
+            <div class="pagination" id="paginationControls">
+                    <label class="pagination-item" for="1">
+                        <img th:src="@{/img/img-inicio/Slider1.jpg}" alt="Control Slider 1">
+                    </label>
+                    <label class="pagination-item" for="2">
+                        <img th:src="@{/img/img-inicio/Slider2.jpg}" alt="Control Slider 2">
+                    </label>
+                    <label class="pagination-item" for="3">
+                        <img th:src="@{/img/img-inicio/Slider3.jpg}" alt="Control Slider 3">
+                    </label>
+                </div>
+        </div>
+    </section>
+
+    <main class="services" id="servicios-section">
+        <div class="services-content container">
+            <h2>Nuestros servicios</h2>
+            <div class="services-group">
+                <div class="services-1"><img th:src="@{/img/img-inicio/Wifi.png}" alt=""><h3>Wifi gratis</h3></div>
+                <div class="services-1"><img th:src="@{/img/img-inicio/Espacio.png}" alt=""><h3>Espacios para estudio/trabajo</h3></div>
+                <div class="services-1"><img th:src="@{/img/img-inicio/Billetera.png}" alt=""><h3>Sistemas de pago</h3></div>
+            </div>
+            <p>En Lora Café, nos enfocamos en brindarte una experiencia única...</p>
+        </div>
+    </main>
+
+    <!-- ========= SECCIÓN DE PROMOCIONES DINÁMICA ========= -->
+    <section class="promociones" id="promos-section">
+        <h2>Nuestras Promociones</h2>
+        <div class="promociones-grid" id="promociones-grid-container">
+            <!-- JavaScript llenará este contenedor con promociones desde la API -->
+        </div>
+    </section>
+
+    <!-- ========= FOOTER (REUTILIZABLE) ========= -->
+    <div th:replace="~{Cliente/fragments/footer :: footer}"></div>
+
+    <!-- Scripts con rutas corregidas -->
+    <script th:src="@{/assets/cliente/js/Inicio.js}"></script>
+    <script th:src="@{/assets/cliente/js/Navbar.js}"></script>
+</body>
+</html>

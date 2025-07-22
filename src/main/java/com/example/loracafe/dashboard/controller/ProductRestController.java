@@ -1,7 +1,8 @@
 package com.example.loracafe.dashboard.controller;
 
 
-import com.example.loracafe.dashboard.entity.Producto;
+import com.example.loracafe.common.entity.Producto;
+import com.example.loracafe.common.dto.ProductoDashboardDto;
 import com.example.loracafe.dashboard.service.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,18 +14,16 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/dashboard/products")
 public class ProductRestController {
 
     @Autowired
     private ProductoService productoService;
 
     @GetMapping
-    public ResponseEntity<List<Producto>> getAllProductos() {
-        List<Producto> productos = productoService.getAllProductos();
-        return ResponseEntity.ok(productos);
+    public ResponseEntity<List<ProductoDashboardDto>> getAllProductos() {
+        return ResponseEntity.ok(productoService.getAllProductosDto());
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<Producto> getProductoById(@PathVariable Integer id) {
         Optional<Producto> productoOptional = productoService.getProductoById(id);

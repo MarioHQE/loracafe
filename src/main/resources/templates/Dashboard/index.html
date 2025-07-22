@@ -1,17 +1,31 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lora Café - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" th:href="@{/assets/dashboard/css/main.css}">
     <link rel="stylesheet" th:href="@{/assets/dashboard/css/dashboard.css}">
     <link rel="stylesheet" th:href="@{/assets/dashboard/css/responsive.css}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Dentro de la etiqueta <head> en Dashboard/index.html -->
+
+    <!-- ... tus otros <link> y <meta> ... -->
+
+    <!-- ============================================= -->
+    <!--     AÑADE ESTAS DOS LÍNEAS PARA EL TOKEN CSRF     -->
+    <!-- ============================================= -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    <meta name="_csrf_parameter" th:content="${_csrf.parameterName}" />
 </head>
+
 <body>
     <div class="app-container">
         <!-- ==================== SIDEBAR ==================== -->
@@ -20,38 +34,57 @@
                 <h1><i class="fas fa-mug-hot"></i> Lora Café</h1>
             </div>
             <div class="menu-items">
-                <a th:href="@{/}" class="menu-item" th:classappend="${page == 'dashboard' ? 'active' : ''}">
-                    <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+                <a th:href="@{/dashboard}" class="menu-item" th:classappend="${page == 'dashboard' ? 'active' : ''}">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
                 </a>
-                <a th:href="@{/products}" class="menu-item" th:classappend="${page == 'products' ? 'active' : ''}">
-                    <i class="fas fa-coffee"></i><span>Productos</span>
+                <a th:href="@{/dashboard/products}" class="menu-item"
+                    th:classappend="${page == 'products' ? 'active' : ''}">
+                    <i class="fas fa-coffee"></i>
+                    <span>Productos</span>
                 </a>
-                <a th:href="@{/orders}" class="menu-item" th:classappend="${page == 'orders' ? 'active' : ''}">
-                    <i class="fas fa-shopping-cart"></i><span>Pedidos</span>
+                <a th:href="@{/dashboard/promotions}" class="menu-item"
+                    th:classappend="${page == 'promotions' ? 'active' : ''}">
+                    <i class="fas fa-tags"></i>
+                    <span>Promociones</span>
                 </a>
-                <a th:href="@{/customers}" class="menu-item" th:classappend="${page == 'customers' ? 'active' : ''}">
-                    <i class="fas fa-users"></i><span>Clientes</span>
+                <a th:href="@{/dashboard/orders}" class="menu-item"
+                    th:classappend="${page == 'orders' ? 'active' : ''}">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Pedidos</span>
                 </a>
-                <a th:href="@{/messages}" class="menu-item" th:classappend="${page == 'messages' ? 'active' : ''}">
-                    <i class="fas fa-envelope"></i><span>Mensajes</span>
+                <a th:href="@{/dashboard/customers}" class="menu-item"
+                    th:classappend="${page == 'customers' ? 'active' : ''}">
+                    <i class="fas fa-users"></i>
+                    <span>Clientes</span>
                 </a>
-                <a th:href="@{/users}" class="menu-item" th:classappend="${page == 'users' ? 'active' : ''}">
-                    <i class="fas fa-user-cog"></i><span>Usuarios</span>
+                <a th:href="@{/dashboard/messages}" class="menu-item"
+                    th:classappend="${page == 'messages' ? 'active' : ''}">
+                    <i class="fas fa-envelope"></i>
+                    <span>Mensajes</span>
                 </a>
-                <a th:href="@{/analytics}" class="menu-item" th:classappend="${page == 'analytics' ? 'active' : ''}">
-                    <i class="fas fa-chart-line"></i><span>Analíticas</span>
+                <a th:href="@{/dashboard/users}" class="menu-item" th:classappend="${page == 'users' ? 'active' : ''}">
+                    <i class="fas fa-user-cog"></i>
+                    <span>Usuarios</span>
                 </a>
-                <a th:href="@{/reports}" class="menu-item" th:classappend="${page == 'reports' ? 'active' : ''}">
-                    <i class="fas fa-file-alt"></i><span>Reportes</span>
+                <a th:href="@{/dashboard/analytics}" class="menu-item"
+                    th:classappend="${page == 'analytics' ? 'active' : ''}">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analíticas</span>
                 </a>
-                <a th:href="@{/settings}" class="menu-item" th:classappend="${page == 'settings' ? 'active' : ''}">
-                    <i class="fas fa-cog"></i><span>Ajustes</span>
+                <a th:href="@{/dashboard/reports}" class="menu-item"
+                    th:classappend="${page == 'reports' ? 'active' : ''}">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Reportes</span>
                 </a>
-                <div class="menu-item" id="logout">
+                
+                <!-- Usamos un div para el logout porque se maneja con un formulario JS -->
+                <div class="menu-item" id="logout-dashboard">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Cerrar Sesión</span>
                 </div>
             </div>
+
         </aside>
 
         <!-- ==================== MAIN CONTENT ==================== -->
@@ -65,13 +98,24 @@
                     <h2 id="page-title" th:text="${#strings.capitalize(page ?: 'Dashboard')}">Dashboard</h2>
                 </div>
                 <div class="header-right">
-                    <div class="notification-bell">
-                        <i class="fas fa-bell"></i>
-                        <span class="badge">5</span>
+                    
+                    <div class="notification-bell" id="notification-container">
+                        <button id="notification-button">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge" id="notification-badge" style="display: none;">0</span>
+                        </button>
+                        <div class="notification-dropdown" id="notification-dropdown">
+                            <div class="notification-header">Notificaciones</div>
+                            <div class="notification-list" id="notification-list">
+                                <!-- JavaScript llenará esta lista -->
+                                <p class="no-notifications">No hay notificaciones nuevas.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="user-profile">
-                        <img th:src="@{/img/img-nosotros/equi14.jpg}" alt="Admin">
-                        <span>Admin</span>
+                    <div class="user-profile" th:if="${usuarioLogueado}">
+                        <img th:src="${usuarioLogueado.imagenUrl != null ? usuarioLogueado.imagenUrl : '/img/img-nosotros/equi1.jpg'}"
+                            alt="Foto de perfil">
+                        <span th:text="${usuarioLogueado.nombre}">Admin</span>
                     </div>
                 </div>
             </header>
@@ -81,7 +125,8 @@
                 <div class="page" id="dashboard-page" th:classappend="${page == 'dashboard' ? 'active' : ''}">
                     <div class="page-title">
                         <h3>Dashboard</h3>
-                        <button class="btn btn-primary" id="generate-report"><i class="fas fa-download"></i> Generar Reporte</button>
+                        <button class="btn btn-primary" id="generate-report"><i class="fas fa-download"></i> Generar
+                            Reporte</button>
                     </div>
 
                     <div class="stats-grid">
@@ -106,9 +151,14 @@
                                 <p>Nuevos Clientes (mes)</p>
                             </div>
                         </div>
-                         <div class="stat-card">
+                        <div class="stat-card">
                             <div class="stat-icon red"><i class="fas fa-comments"></i></div>
-                            <div class="stat-info"><h4 id="new-messages">18</h4><p>Mensajes Nuevos</p></div>
+                            <div class="stat-info">
+                                <!-- ¡¡LÍNEA CORREGIDA!! -->
+                                <!-- Usamos th:text para mostrar el valor que viene del backend -->
+                                <h4 id="new-messages" th:text="${mensajesNuevos ?: 0}">0</h4>
+                                <p>Mensajes Nuevos</p>
+                            </div>
                         </div>
                     </div>
 
@@ -123,27 +173,47 @@
                         </div>
                     </div>
 
+                    <!-- Dentro de la página del Dashboard en Dashboard/index.html -->
+
                     <div class="card">
-                        <div class="card-header"><h4>Pedidos Recientes</h4></div>
+                        <div class="card-header">
+                            <h4>Pedidos Recientes</h4>
+                        </div>
                         <div class="card-body">
                             <table id="recent-orders-table">
                                 <thead>
                                     <tr>
-                                        <th>ID</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th><th>Acciones</th>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Fecha</th>
+                                        <th>Total</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr th:each="pedido : ${pedidosRecientes}">
                                         <td th:text="${pedido.id}">ORD-001</td>
-                                        <td th:text="${pedido.usuario != null ? pedido.usuario.nombre + ' ' + pedido.usuario.apellido : 'N/A'}">Cliente</td>
-                                        <td th:text="${#temporals.format(pedido.fechaPedido, 'dd-MM-yyyy HH:mm')}">Fecha</td>
-                                        <td th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2, 'COMMA')}">S/ 0.00</td>
+                                        <td
+                                            th:text="${pedido.usuario != null ? pedido.usuario.nombre + ' ' + pedido.usuario.apellido : 'N/A'}">
+                                            Cliente</td>
+                                        <td th:text="${#temporals.format(pedido.fechaPedido, 'dd-MM-yyyy HH:mm')}">Fecha
+                                        </td>
+                                        <td th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2, 'COMMA')}">S/
+                                            0.00</td>
                                         <td>
-                                            <span class="status" th:classappend="${#strings.toLowerCase(pedido.estado.name())}" th:text="${#strings.replace(pedido.estado.name(), '_', ' ')}">Estado</span>
+                                            <span class="status"
+                                                th:classappend="${#strings.toLowerCase(pedido.estado.name())}"
+                                                th:text="${#strings.replace(pedido.estado.name(), '_', ' ')}">Estado</span>
                                         </td>
                                         <td>
-                                            <button class="action-btn view" th:attr="data-id=${pedido.id}"><i class="fas fa-eye"></i></button>
-                                            <button class="action-btn edit" th:attr="data-id=${pedido.id}"><i class="fas fa-edit"></i></button>
+                                            <button class="action-btn view" th:attr="data-id=${pedido.id}">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <!-- ¡¡AQUÍ ESTÁ LA CORRECCIÓN!! -->
+                                            <button class="action-btn status-update" th:attr="data-id=${pedido.id}">
+                                                <i class="fas fa-sync-alt"></i>
+                                            </button>
                                         </td>
                                     </tr>
                                     <tr th:if="${pedidosRecientes == null or #lists.isEmpty(pedidosRecientes)}">
@@ -159,7 +229,8 @@
                 <div class="page" id="products-page" th:classappend="${page == 'products' ? 'active' : ''}">
                     <div class="page-title">
                         <h3>Gestión de Productos</h3>
-                        <button class="btn btn-primary" id="add-product-btn"><i class="fas fa-plus"></i> Agregar Producto</button>
+                        <button class="btn btn-primary" id="add-product-btn"><i class="fas fa-plus"></i> Agregar
+                            Producto</button>
                     </div>
                     <div class="card">
                         <div class="card-header">
@@ -172,7 +243,15 @@
                         <div class="card-body">
                             <table id="products-table">
                                 <thead>
-                                    <tr><th>Imagen</th><th>Nombre</th><th>Categoría</th><th>Descripción</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr>
+                                    <tr>
+                                        <th>Imagen</th>
+                                        <th>Nombre</th>
+                                        <th>Categoría</th>
+                                        <th>Descripción</th>
+                                        <th>Precio</th>
+                                        <th>Stock</th>
+                                        <th>Acciones</th>
+                                    </tr>
                                 </thead>
                                 <tbody><!-- JS llenará esta tabla --></tbody>
                             </table>
@@ -180,15 +259,47 @@
                     </div>
                 </div>
 
+                <!-- ==================== PROMOTIONS PAGE ==================== -->
+                <div class="page" id="promotions-page" th:classappend="${page == 'promotions' ? 'active' : ''}">
+                    <div class="page-title">
+                        <h3>Gestión de Promociones</h3>
+                        <button class="btn btn-primary" id="add-promotion-btn">
+                            <i class="fas fa-plus"></i> Nueva Promoción
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Lista de Promociones</h4>
+                        </div>
+                        <div class="card-body">
+                            <table id="promotions-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Descripción</th>
+                                        <th>Descuento</th>
+                                        <th>Vigencia</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- JavaScript llenará esta tabla -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- ==================== ORDERS PAGE ==================== -->
                 <div class="page" id="orders-page" th:classappend="${page == 'orders' ? 'active' : ''}">
-                     <div class="page-title">
+                    <div class="page-title">
                         <h3>Gestión de Pedidos</h3>
                     </div>
                     <div class="card">
                         <div class="card-header">
                             <h4>Historial de Pedidos</h4>
-                             <div class="filters">
+                            <div class="filters">
                                 <select id="order-status-filter">
                                     <option value="all">Todos los estados</option>
                                     <option value="PENDIENTE">Pendientes</option>
@@ -202,7 +313,15 @@
                         <div class="card-body">
                             <table id="orders-table">
                                 <thead>
-                                    <tr><th>ID</th><th>Cliente</th><th>Fecha</th><th>Productos</th><th>Total</th><th>Estado</th><th>Acciones</th></tr>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Fecha</th>
+                                        <th>Productos</th>
+                                        <th>Total</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
                                 </thead>
                                 <tbody><!-- JS llenará esta tabla --></tbody>
                             </table>
@@ -212,13 +331,24 @@
 
                 <!-- ==================== CUSTOMERS PAGE ==================== -->
                 <div class="page" id="customers-page" th:classappend="${page == 'customers' ? 'active' : ''}">
-                    <div class="page-title"><h3>Clientes Registrados</h3></div>
+                    <div class="page-title">
+                        <h3>Clientes Registrados</h3>
+                    </div>
                     <div class="card">
-                        <div class="card-header"><h4>Lista de Clientes</h4></div>
+                        <div class="card-header">
+                            <h4>Lista de Clientes</h4>
+                        </div>
                         <div class="card-body">
                             <table id="customers-table">
                                 <thead>
-                                    <tr><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Registro</th><th>Total Pedidos</th><th>Acciones</th></tr>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Teléfono</th>
+                                        <th>Registro</th>
+                                        <th>Total Pedidos</th>
+                                        <th>Acciones</th>
+                                    </tr>
                                 </thead>
                                 <tbody><!-- JS llenará esta tabla --></tbody>
                             </table>
@@ -228,13 +358,25 @@
 
                 <!-- ==================== MESSAGES PAGE ==================== -->
                 <div class="page" id="messages-page" th:classappend="${page == 'messages' ? 'active' : ''}">
-                    <div class="page-title"><h3>Mensajes de Clientes</h3></div>
-                     <div class="card">
-                        <div class="card-header"><h4>Mensajes Recibidos</h4></div>
+                    <div class="page-title">
+                        <h3>Mensajes de Clientes</h3>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Mensajes Recibidos</h4>
+                        </div>
                         <div class="card-body">
                             <table id="messages-table">
                                 <thead>
-                                    <tr><th>Nombre</th><th>Email</th><th>Asunto</th><th>Mensaje</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Asunto</th>
+                                        <th>Mensaje</th>
+                                        <th>Fecha</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
                                 </thead>
                                 <tbody><!-- JS llenará esta tabla --></tbody>
                             </table>
@@ -246,14 +388,24 @@
                 <div class="page" id="users-page" th:classappend="${page == 'users' ? 'active' : ''}">
                     <div class="page-title">
                         <h3>Administración de Usuarios</h3>
-                        <button class="btn btn-primary" id="add-user-btn"><i class="fas fa-plus"></i> Nuevo Usuario</button>
+                        <button class="btn btn-primary" id="add-user-btn"><i class="fas fa-plus"></i> Nuevo
+                            Usuario</button>
                     </div>
                     <div class="card">
-                        <div class="card-header"><h4>Lista de Usuarios</h4></div>
+                        <div class="card-header">
+                            <h4>Lista de Usuarios</h4>
+                        </div>
                         <div class="card-body">
                             <table id="users-table">
                                 <thead>
-                                    <tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Último Acceso</th><th>Estado</th><th>Acciones</th></tr>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Rol</th>
+                                        <th>Último Acceso</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
                                 </thead>
                                 <tbody><!-- JS llenará esta tabla --></tbody>
                             </table>
@@ -264,34 +416,73 @@
                 <!-- ==================== ANALYTICS PAGE ==================== -->
                 <div class="page" id="analytics-page" th:classappend="${page == 'analytics' ? 'active' : ''}">
                     <!-- Contenido completo de la página de analíticas -->
-                    <div class="page-title"><h3>Análisis de Datos</h3></div>
-                    <div class="grid-2">
-                        <div class="chart-container"><h4>Productos Más Vendidos</h4><div class="chart-box"><canvas id="top-products-chart"></canvas></div></div>
-                        <div class="chart-container"><h4>Ingresos por Hora</h4><div class="chart-box"><canvas id="revenue-by-hour-chart"></canvas></div></div>
+                    <div class="page-title">
+                        <h3>Análisis de Datos</h3>
                     </div>
-                    <div class="chart-container"><h4>Tendencias de Ventas</h4><div class="chart-box"><canvas id="sales-trends-chart"></canvas></div></div>
-                    <!-- ... más contenido ... -->
+                    <div class="grid-2">
+                        <div class="chart-container">
+                            <h4>Productos Más Vendidos</h4>
+                            <div class="chart-box"><canvas id="top-products-chart"></canvas></div>
+                        </div>
+                        <div class="chart-container">
+                            <h4>Ingresos por Hora</h4>
+                            <div class="chart-box"><canvas id="revenue-by-hour-chart"></canvas></div>
+                        </div>
+                    </div>
+                    
                 </div>
 
                 <!-- ==================== REPORTS PAGE ==================== -->
                 <div class="page" id="reports-page" th:classappend="${page == 'reports' ? 'active' : ''}">
-                    <!-- Contenido completo de la página de reportes -->
-                     <div class="page-title"><h3>Generación de Reportes</h3></div>
-                     <div class="grid-3">
-                        <div class="report-card"><i class="fas fa-shopping-cart"></i><h4>Reporte de Ventas</h4><button class="btn btn-primary">Generar</button></div>
-                        <div class="report-card"><i class="fas fa-coffee"></i><h4>Reporte de Productos</h4><button class="btn btn-primary">Generar</button></div>
-                        <div class="report-card"><i class="fas fa-users"></i><h4>Reporte de Clientes</h4><button class="btn btn-primary">Generar</button></div>
+                    <div class="page-title">
+                        <h3>Generación de Reportes</h3>
+                    </div>
+
+                    <!-- Cuadrícula para las tarjetas de reporte -->
+                    <div class="report-card-grid">
+                        <!-- Tarjeta 1: Reporte de Ventas -->
+                        <div class="report-card">
+                            <div class="report-card-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <h4>Reporte de Ventas</h4>
+                            <p>Genera un informe detallado de todos los pedidos completados, ideal para análisis
+                                financieros.</p>
+                            <button class="btn btn-primary generate-report" data-type="sales">
+                                <i class="fas fa-download"></i> Generar
+                            </button>
+                        </div>
+
+                        <!-- Tarjeta 2: Reporte de Productos -->
+                        <div class="report-card">
+                            <div class="report-card-icon">
+                                <i class="fas fa-coffee"></i>
+                            </div>
+                            <h4>Reporte de Productos</h4>
+                            <p>Crea un listado completo de tu inventario actual, incluyendo nombres, categorías, precios
+                                y stock.</p>
+                            <button class="btn btn-primary generate-report" data-type="products">
+                                <i class="fas fa-download"></i> Generar PDF
+                            </button>
+                        </div>
+
+                        <!-- Tarjeta 3: Reporte de Clientes -->
+                        <div class="report-card">
+                            <div class="report-card-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h4>Reporte de Clientes</h4>
+                            <p>Exporta una lista de todos los usuarios registrados con el rol de cliente y sus detalles
+                                de contacto.</p>
+                            <button class="btn btn-primary generate-report" data-type="customers">
+                                <i class="fas fa-download"></i> Generar
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- ==================== SETTINGS PAGE ==================== -->
-                <div class="page" id="settings-page" th:classappend="${page == 'settings' ? 'active' : ''}">
-                    <div class="page-title"><h3>Configuración del Sistema</h3></div>
-                    <div class="grid-2">
-                        <div class="card"><div class="card-header"><h4><i class="fas fa-store"></i> Configuración de la Cafetería</h4></div></div>
-                        <div class="card"><div class="card-header"><h4><i class="fas fa-user-shield"></i> Seguridad</h4></div></div>
-                    </div>
-                </div>
+
+               
 
                 <div id="modal-container"></div>
             </div>
@@ -301,12 +492,14 @@
 
     <script th:src="@{/assets/dashboard/js/app.js}"></script>
     <script th:src="@{/assets/dashboard/js/products.js}"></script>
+    <script th:src="@{/assets/dashboard/js/promotions.js}"></script>
     <script th:src="@{/assets/dashboard/js/messages.js}"></script>
     <script th:src="@{/assets/dashboard/js/orders.js}"></script>
     <script th:src="@{/assets/dashboard/js/users.js}"></script>
     <script th:src="@{/assets/dashboard/js/customers.js}"></script>
     <script th:src="@{/assets/dashboard/js/analytics.js}"></script>
     <script th:src="@{/assets/dashboard/js/reports.js}"></script>
-    
+
 </body>
+
 </html>

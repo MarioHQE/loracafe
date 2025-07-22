@@ -1,13 +1,16 @@
 package com.example.loracafe.dashboard.service;
 
-import com.example.loracafe.dashboard.entity.Producto;
-import com.example.loracafe.dashboard.repository.ProductoRepository;
+import com.example.loracafe.common.entity.Producto;
+import com.example.loracafe.common.dto.ProductoDashboardDto; 
+import com.example.loracafe.common.repository.ProductoRepository;
+
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductoService {
@@ -16,10 +19,22 @@ public class ProductoService {
     private ProductoRepository productoRepository;
 
     /**
-      @return 
+     * Obtiene una lista de las ENTIDADES Producto completas.
+     * Usado internamente por otros servicios, como el ReportService.
+     * @return Lista de todas las entidades Producto.
      */
     public List<Producto> getAllProductos() {
         return productoRepository.findAll();
+    }
+
+    /**
+      @return 
+     */
+    public List<ProductoDashboardDto> getAllProductosDto() {
+        return productoRepository.findAll()
+                .stream()
+                .map(ProductoDashboardDto::new)
+                .collect(Collectors.toList());
     }
 
     /**

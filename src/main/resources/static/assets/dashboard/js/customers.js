@@ -1,24 +1,27 @@
 // customers.js
 
-const API_URL_CUSTOMERS = '/api/customers';
+const API_URL_CUSTOMERS = '/api/dashboard/customers';
 
-// ==================== INICIALIZACIÓN ====================
+/**
+ * Listener que se ejecuta cuando el DOM está completamente cargado.
+ */
 document.addEventListener('DOMContentLoaded', () => {
-    // Si la página de clientes está activa, cargamos los datos.
+    // Si la página de clientes es la que está activa, cargamos la tabla y configuramos los listeners.
     if (document.getElementById('customers-page')?.classList.contains('active')) {
         populateCustomersTable();
         setupCustomersEventListeners();
     }
 });
 
+/**
+ * Configura los event listeners para la página de clientes, como la barra de búsqueda.
+ */
 function setupCustomersEventListeners() {
     const customerSearch = document.getElementById('customer-search');
     customerSearch?.addEventListener('input', (e) => {
         populateCustomersTable(e.target.value);
     });
 }
-
-// ==================== LÓGICA DE DATOS (API) ====================
 
 /**
  * Rellena la tabla de clientes, que son usuarios con el rol 'CLIENTE'.
@@ -29,42 +32,39 @@ function populateCustomersTable(searchTerm = '') {
     if (!tableBody) return;
     tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Cargando clientes...</td></tr>';
 
-    // Construimos la URL para obtener solo clientes. Si hay búsqueda, la añadimos.
-    const url = searchTerm 
-        ? `${API_URL_CUSTOMERS}/search?term=${encodeURIComponent(searchTerm)}`
-        : API_URL_CUSTOMERS;
+    const url = API_URL_CUSTOMERS; // La búsqueda se hará en el frontend por ahora
 
     fetch(url)
-        .then(response => {
-            if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-            return response.json();
-        })
+        .then(response => response.json())
         .then(customers => {
             tableBody.innerHTML = '';
-            if (customers.length === 0) {
+            
+            const filteredCustomers = searchTerm
+                ? customers.filter(c => 
+                    (c.nombre + ' ' + c.apellido).toLowerCase().includes(searchTerm.toLowerCase()) || 
+                    c.email.toLowerCase().includes(searchTerm.toLowerCase()))
+                : customers;
+
+            if (filteredCustomers.length === 0) {
                 tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No se encontraron clientes.</td></tr>';
                 return;
             }
-            customers.forEach(customer => {
-                const row = document.createElement('tr');
-                // La API de clientes debería devolver también el total de pedidos.
-                // Por ahora, usamos un placeholder.
-                const totalPedidos = customer.totalPedidos || 0; 
-                
+            
+            filteredCustomers.forEach(customer => {
+                const row = tableBody.insertRow();
+                // ¡¡CAMBIO CLAVE AQUÍ!!
+                // Ahora usamos el campo 'totalPedidos' que viene del DTO.
                 row.innerHTML = `
                     <td>${customer.nombre} ${customer.apellido}</td>
                     <td>${customer.email}</td>
                     <td>${customer.telefono || 'N/A'}</td>
                     <td>${new Date(customer.fechaRegistro).toLocaleDateString()}</td>
-                    <td>${totalPedidos}</td>
+                    <td>${customer.totalPedidos}</td>
                     <td>
-                        <button class="action-btn view" data-id="${customer.id}"><i class="fas fa-eye"></i></button>
-                        <button class="action-btn edit" data-id="${customer.id}"><i class="fas fa-edit"></i></button>
+                        <a href="/dashboard/users" class="action-btn edit" title="Gestionar en Usuarios"><i class="fas fa-edit"></i></a>
                     </td>
                 `;
-                tableBody.appendChild(row);
             });
-            // NOTA: Los listeners de editar/ver podrían redirigir al modal de usuario.
         })
         .catch(error => {
             console.error('Error al cargar clientes:', error);

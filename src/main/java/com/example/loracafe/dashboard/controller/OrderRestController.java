@@ -1,8 +1,10 @@
 package com.example.loracafe.dashboard.controller;
 
-import com.example.loracafe.dashboard.entity.Pedido;
-import com.example.loracafe.dashboard.entity.Pedido.EstadoPedido;
-import com.example.loracafe.dashboard.service.PedidoService;
+import com.example.loracafe.common.dto.PedidoDashboardDto;
+import com.example.loracafe.common.dto.PedidoDetalleDto; // DTO para la vista detallada
+import com.example.loracafe.common.entity.Pedido;
+import com.example.loracafe.common.entity.Pedido.EstadoPedido;
+import com.example.loracafe.common.service.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,14 +18,19 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/api/dashboard/orders")
 public class OrderRestController {
 
     @Autowired
     private PedidoService pedidoService;
 
+    /**
+     * ¡¡MÉTODO CORREGIDO!!
+     * Obtiene todos los pedidos de forma paginada y convertidos a DTOs para evitar errores de serialización.
+     * @return Una página de PedidoDashboardDto.
+     */
     @GetMapping
-    public ResponseEntity<Page<Pedido>> getAllPedidos(
+    public ResponseEntity<Page<PedidoDashboardDto>> getAllPedidos(
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String date,
             Pageable pageable) {
@@ -34,8 +41,7 @@ public class OrderRestController {
             try {
                 EstadoPedido estadoPedido = EstadoPedido.valueOf(status.toUpperCase());
                 spec = spec.and((root, query, cb) -> cb.equal(root.get("estado"), estadoPedido));
-            } catch (IllegalArgumentException e) {
-            }
+            } catch (IllegalArgumentException e) { /* Ignorar estado inválido */ }
         }
 
         if (date != null && !date.isEmpty()) {
@@ -44,23 +50,36 @@ public class OrderRestController {
                 spec = spec.and((root, query, cb) -> 
                     cb.between(root.get("fechaPedido"), localDate.atStartOfDay(), localDate.atTime(23, 59, 59))
                 );
-            } catch(Exception e) {
-            }
+            } catch(Exception e) { /* Ignorar fecha inválida */ }
         }
         
-        Page<Pedido> pedidos = pedidoService.getAllPedidos(spec, pageable);
-        return ResponseEntity.ok(pedidos);
+        // 1. Obtenemos la página de entidades Pedido.
+        Page<Pedido> pedidosPage = pedidoService.getAllPedidos(spec, pageable);
+
+        // 2. Convertimos la página de entidades a una página de DTOs.
+        Page<PedidoDashboardDto> pedidosDtoPage = pedidosPage.map(PedidoDashboardDto::new);
+        
+        // 3. Devolvemos la página de DTOs.
+        return ResponseEntity.ok(pedidosDtoPage);
     }
 
+    /**
+     * ¡¡MÉTODO CORREGIDO!!
+     * Obtiene los detalles de un solo pedido usando un DTO.
+     */
     @GetMapping("/{id}")
-    public ResponseEntity<Pedido> getPedidoById(@PathVariable Integer id) {
+    public ResponseEntity<PedidoDetalleDto> getPedidoById(@PathVariable Integer id) {
         return pedidoService.getPedidoById(id)
-                .map(ResponseEntity::ok)
+                .map(pedido -> ResponseEntity.ok(new PedidoDetalleDto(pedido)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     * ¡¡MÉTODO CORREGIDO!!
+     * Actualiza el estado de un pedido y devuelve el pedido actualizado como un DTO.
+     */
     @PutMapping("/{id}/status")
-    public ResponseEntity<Pedido> updateOrderStatus(@PathVariable Integer id, @RequestBody Map<String, String> statusUpdate) {
+    public ResponseEntity<PedidoDashboardDto> updateOrderStatus(@PathVariable Integer id, @RequestBody Map<String, String> statusUpdate) {
         String nuevoEstadoStr = statusUpdate.get("status");
         if (nuevoEstadoStr == null || nuevoEstadoStr.trim().isEmpty()) {
             return ResponseEntity.badRequest().build();
@@ -70,7 +89,7 @@ public class OrderRestController {
             Pedido.EstadoPedido nuevoEstado = Pedido.EstadoPedido.valueOf(nuevoEstadoStr.toUpperCase());
             
             Optional<Pedido> pedidoOptional = pedidoService.getPedidoById(id);
-            if (!pedidoOptional.isPresent()) {
+            if (pedidoOptional.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
 
@@ -78,7 +97,8 @@ public class OrderRestController {
             pedido.setEstado(nuevoEstado);
             
             Pedido pedidoActualizado = pedidoService.savePedido(pedido);
-            return ResponseEntity.ok(pedidoActualizado);
+            // Devolvemos el DTO actualizado
+            return ResponseEntity.ok(new PedidoDashboardDto(pedidoActualizado));
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();

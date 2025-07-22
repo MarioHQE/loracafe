@@ -1,0 +1,102 @@
+/* EstiloFooter.css */
+
+.site-footer {
+    background-color: #333; /* Un color oscuro y elegante */
+    color: #a9a9a9; /* Texto gris claro para buena legibilidad */
+    padding: 45px 0 20px;
+    font-size: 15px;
+    line-height: 24px;
+}
+
+.footer-container {
+    max-width: 1170px;
+    margin: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 0 15px;
+}
+
+.site-footer h4 {
+    color: #fff;
+    font-size: 18px;
+    text-transform: uppercase;
+    margin-bottom: 25px;
+    font-weight: 600;
+    position: relative;
+}
+
+/* Pequeña línea decorativa bajo los títulos */
+.site-footer h4::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    background-color: #e27107; /* Color de tu marca */
+    height: 2px;
+    width: 50px;
+}
+
+.footer-about, .footer-links, .footer-contact {
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+@media (min-width: 768px) {
+    .footer-about { width: 40%; }
+    .footer-links { width: 25%; }
+    .footer-contact { width: 25%; }
+}
+
+.footer-about p {
+    text-align: justify;
+}
+
+.footer-links ul, .footer-contact ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.footer-links ul a, .footer-contact ul span, .footer-contact ul a {
+    color: #a9a9a9;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links ul a:hover {
+    color: #e27107;
+}
+
+.footer-contact ul li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.footer-contact ion-icon {
+    font-size: 20px;
+    margin-right: 10px;
+    color: #e27107;
+}
+
+.footer-social {
+    margin-top: 20px;
+}
+
+.social-icon {
+    color: #fff;
+    font-size: 24px;
+    margin-right: 15px;
+    transition: color 0.3s ease;
+}
+
+.social-icon:hover {
+    color: #e27107;
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #444;
+    margin-top: 20px;
+}

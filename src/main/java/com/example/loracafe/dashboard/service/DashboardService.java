@@ -1,15 +1,20 @@
 package com.example.loracafe.dashboard.service;
 
-import com.example.loracafe.dashboard.entity.Pedido;
-import com.example.loracafe.dashboard.entity.Usuario;
-import com.example.loracafe.dashboard.repository.DetallePedidoRepository;
-import com.example.loracafe.dashboard.repository.PedidoRepository;
-import com.example.loracafe.dashboard.repository.ProductoRepository;
-import com.example.loracafe.dashboard.repository.UsuarioRepository;
+import com.example.loracafe.common.entity.Mensaje;
+import com.example.loracafe.common.entity.Pedido;
+import com.example.loracafe.common.entity.Usuario;
+import com.example.loracafe.common.dto.NotificacionDto;
+import com.example.loracafe.common.repository.DetallePedidoRepository;
+import com.example.loracafe.common.repository.MensajeRepository;
+import com.example.loracafe.common.repository.PedidoRepository;
+import com.example.loracafe.common.repository.ProductoRepository;
+import com.example.loracafe.common.repository.UsuarioRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.format.TextStyle;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.HashMap;
 
 
 @Service
@@ -34,23 +40,31 @@ public class DashboardService {
     @Autowired
     private DetallePedidoRepository detallePedidoRepository;
 
+    @Autowired
+    private MensajeRepository mensajeRepository;
+
+
     /**
       @return 
      */
     public Map<String, Object> getDashboardData() {
-        Map<String, Object> data = new HashMap<>();
-        LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
-        LocalDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atStartOfDay();
-        
-        data.put("pedidosHoy", pedidoRepository.countByFechaPedidoAfter(startOfToday));
-        data.put("totalProductos", productoRepository.count());
-        data.put("nuevosClientes", usuarioRepository.countByRolAndFechaRegistroAfter(Usuario.Rol.CLIENTE, startOfMonth));
-        List<Pedido> pedidosRecientes = pedidoRepository.findTop5ByOrderByFechaPedidoDesc();
-data.put("pedidosRecientes", pedidosRecientes);
-        
-        return data;
-    }
-
+    Map<String, Object> data = new HashMap<>();
+    LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
+    LocalDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atStartOfDay();
+    
+    data.put("pedidosHoy", pedidoRepository.countByFechaPedidoAfter(startOfToday));
+    data.put("totalProductos", productoRepository.count());
+    data.put("nuevosClientes", usuarioRepository.countByRolAndFechaRegistroAfter(Usuario.Rol.CLIENTE, startOfMonth));
+    
+    // ¡¡NUEVA LÍNEA!!
+    // Contamos los mensajes que tienen el estado 'NUEVO'.
+    data.put("mensajesNuevos", mensajeRepository.countByEstado(Mensaje.EstadoMensaje.NUEVO));
+    
+    List<Pedido> pedidosRecientes = pedidoRepository.findTop5ByOrderByFechaPedidoDesc();
+    data.put("pedidosRecientes", pedidosRecientes);
+    
+    return data;
+}
     /**
       @return
      */
@@ -155,5 +169,69 @@ data.put("pedidosRecientes", pedidosRecientes);
         result.put("labels", hourlyMap.keySet().stream().map(h -> String.format("%02d:00", h)).collect(Collectors.toList()));
         result.put("data", new ArrayList<>(hourlyMap.values()));
         return result;
+    }
+
+    public List<NotificacionDto> getNotificaciones() {
+        List<NotificacionDto> notificaciones = new ArrayList<>();
+
+        // 1. Obtener los 5 pedidos más recientes
+        List<Pedido> pedidosRecientes = pedidoRepository.findTop5ByOrderByFechaPedidoDesc();
+        pedidosRecientes.forEach(p -> notificaciones.add(new NotificacionDto(
+            "PEDIDO",
+            "Nuevo pedido #" + p.getId() + " de " + (p.getUsuario() != null ? p.getUsuario().getNombre() : "Cliente"),
+            p.getFechaPedido(),
+            "/dashboard/orders"
+        )));
+
+        // 2. Obtener los 5 mensajes más recientes
+        // (Necesitaríamos un método findTop5... en MensajeRepository)
+        List<Mensaje> mensajesRecientes = mensajeRepository.findTop5ByOrderByFechaEnvioDesc();
+        mensajesRecientes.forEach(m -> notificaciones.add(new NotificacionDto(
+            "MENSAJE",
+            "Nuevo mensaje de " + m.getNombre(),
+            m.getFechaEnvio(),
+            "/dashboard/messages"
+        )));
+
+        // 3. Ordenar todas las notificaciones por fecha, de más reciente a más antigua
+        notificaciones.sort(Comparator.comparing(NotificacionDto::getFecha).reversed());
+
+        // 4. Devolver solo las 5 más recientes en total
+        return notificaciones.stream().limit(5).collect(Collectors.toList());
+    }
+
+    // Dentro de DashboardService.java
+
+    /**
+     * ¡NUEVO!
+     * Calcula el número total de notificaciones no vistas (pedidos + mensajes).
+     * @return Un mapa con el conteo total.
+     */
+    public Map<String, Long> getNotificationSummary() {
+        long unreadPedidos = pedidoRepository.countByVistoFalse();
+        long unreadMensajes = mensajeRepository.countByVistoFalse();
+        Map<String, Long> summary = new HashMap<>();
+        summary.put("totalUnread", unreadPedidos + unreadMensajes);
+        return summary;
+    }
+
+    /**
+     * ¡NUEVO!
+     * Marca todos los pedidos y mensajes no vistos como vistos.
+     * Es transaccional para asegurar que todos los cambios se guarden.
+     */
+    @Transactional
+    public void markAllNotificationsAsRead() {
+        // Marcamos pedidos
+        List<Pedido> unreadPedidos = pedidoRepository.findAll().stream()
+                .filter(p -> !p.isVisto()).collect(Collectors.toList());
+        unreadPedidos.forEach(p -> p.setVisto(true));
+        pedidoRepository.saveAll(unreadPedidos);
+
+        // Marcamos mensajes
+        List<Mensaje> unreadMensajes = mensajeRepository.findAll().stream()
+                .filter(m -> !m.isVisto()).collect(Collectors.toList());
+        unreadMensajes.forEach(m -> m.setVisto(true));
+        mensajeRepository.saveAll(unreadMensajes);
     }
 }

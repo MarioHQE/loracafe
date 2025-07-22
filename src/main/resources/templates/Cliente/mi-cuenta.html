@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Cuenta - Lora Café</title>
+    <!-- Metatags para el token de seguridad CSRF -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    
+    <link rel="stylesheet" th:href="@{/assets/cliente/css/EstiloNavbar.css}" />
+    <link rel="stylesheet" th:href="@{/assets/cliente/css/EstiloMiCuenta.css}" />
+    <link rel="stylesheet" th:href="@{/assets/cliente/css/EstiloFooter.css}" />
+
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+
+
+</head>
+<body>
+    <div th:replace="~{Cliente/fragments/navbar :: navbar}"></div>
+
+    <main class="account-container">
+        <h1>Mi Cuenta</h1>
+
+        <div class="tabs">
+            <button class="tab-link active" data-tab="perfil">Mi Perfil</button>
+            <button class="tab-link" data-tab="pedidos">Mis Pedidos</button>
+            <button class="tab-link" data-tab="mensajes">Mis Mensajes</button>
+        </div>
+
+        <div id="perfil" class="tab-content active">
+            <h2>Mi Perfil</h2>
+            <p>Aquí podrás ver y actualizar tus datos personales.</p>
+            
+            <form id="profile-form" class="profile-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="profile-nombre">Nombre:</label>
+                        <input type="text" id="profile-nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="profile-apellido">Apellido:</label>
+                        <input type="text" id="profile-apellido" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="profile-email">Correo Electrónico:</label>
+                    <input type="email" id="profile-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="profile-telefono">Teléfono:</label>
+                    <input type="tel" id="profile-telefono">
+                </div>
+                <div class="form-group">
+                    <label for="profile-direccion">Dirección:</label>
+                    <input type="text" id="profile-direccion">
+                </div>
+                <button type="submit" class="btn-save">Guardar Cambios</button>
+            </form>
+            <div id="profile-message" class="message"></div>
+        </div>
+
+        <div id="pedidos" class="tab-content">
+            <h2>Mis Pedidos</h2>
+            <div id="pedidos-container"><p>Cargando tus pedidos...</p></div>
+        </div>
+
+        <div id="mensajes" class="tab-content">
+            <h2>Mis Mensajes</h2>
+            <div id="mensajes-container"><p>Cargando tus mensajes...</p></div>
+        </div>
+    </main>
+
+    <div th:replace="~{Cliente/fragments/footer :: footer}"></div>
+    
+    <script th:src="@{/assets/cliente/js/mi-cuenta.js}"></script>
+    <script th:src="@{/assets/cliente/js/Navbar.js}"></script>
+</body>
+</html>

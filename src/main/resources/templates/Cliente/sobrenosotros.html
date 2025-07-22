@@ -1,53 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Nosotros</title>
-    <script src="https://kit.fontawesome.com/eb344c5846.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="../../Vista/Estilos/EstiloNosotros.css" />
-    <link rel="stylesheet" href="../../Vista/Estilos/EstiloNavbar.css" />
+    <title>Sobre Nosotros - Lora Café</title>
+    <!-- Metatags para el token de seguridad CSRF, necesarios para el formulario -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     
+    <script src="https://kit.fontawesome.com/eb344c5846.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" th:href="@{/assets/cliente/css/EstiloNosotros.css}" />
+    <link rel="stylesheet" th:href="@{/assets/cliente/css/EstiloNavbar.css}" />
+    <link rel="stylesheet" th:href="@{/assets/cliente/css/EstiloFooter.css}" />
 
 </head>
 
 <body>
-    <nav>
-        
-        <input type="checkbox" id="check">
-        
-        <label for="check" class="checkbtn">
-          <i class="fas fa-bars"></i>
-        </label>
-        
-        <a href="../inicio.html" class="enlace">
-            <img src="../../Vista/Imagenes/img-inicio/LOGO.jpeg" alt="" class="logo">
-        </a>
-        
-        
-        <ul>
-            <li><a href="../inicio.html">Inicio</a></li>
-            <li><a href="sobrenosotros.html">Sobre Nosotros</a></li>
-            <li><a href="carta.html">Carta</a></li>
-            <li><a href="login.html">Iniciar Sesión</a></li>
-            <li><a href="carrito.html" id="cart"><img src="../../Vista/Imagenes/img-carta/shopping-cart.png" alt=""><span id="cuenta-carrito">0</span></a></li>
-        </ul>
-      </nav>
+    <div th:replace="~{Cliente/fragments/navbar :: navbar}"></div>
 
-
-      <div class="heading">
-        
+    <div class="heading">
         <h1>Sobre Nosotros</h1>
-        
     </div>
+    
     <div class="container">
         <section class="about">
             <div class="about-image animate-left">
-                <img src="../../Vista/Imagenes/img-nosotros/fondocafe5.jpg" alt="Imagen Lora Café" />
+                <img th:src="@{/img/img-nosotros/fondocafe5.jpg}" alt="Imagen Lora Café" />
             </div>
             <div class="about-content animate-right">
-                
                 <h2>¿Quiénes Somos?</h2>
                 <p>
                     Somos Lora Café nos dedicamos a ofrecer una experiencia única para los amantes del café.
@@ -60,41 +41,30 @@
                         artesanal y platos ligeros preparados con ingredientes frescos y locales.
                         En Lora Café, creemos en la importancia de la sostenibilidad, por lo que
                         trabajamos con proveedores responsables y mantenemos prácticas amigables
-                        con el medio ambiente. ¡Ven a disfrutar del auténtico sabor del café en Lora Café! </span>
-                
+                        con el medio ambiente. ¡Ven a disfrutar del auténtico sabor del café en Lora Café! 
+                    </span>
                 </p>
-            
                 <button id="toggleButton" class="toggle-button">Leer más</button>
             </div>
-
-            
         </section>
 
-        
         <div class="mision-vision-container">
             <div class="mision">
                 <h3>Misión</h3>
-                <p>
-                    Ofrecer una experiencia única en cada visita, combinando el mejor café peruano 
-                    con un servicio amigable y responsable, en un ambiente acogedor.
-                </p>
-                <img src="../../Vista/Imagenes/img-nosotros/mision.png" alt="Imagen Misión" />
+                <p>Ofrecer una experiencia única en cada visita, combinando el mejor café peruano con un servicio amigable y responsable, en un ambiente acogedor.</p>
+                <img th:src="@{/img/img-nosotros/mision.png}" alt="Imagen Misión" />
             </div>
             <div class="vision">
                 <h3>Visión</h3>
-                <p>
-                    Ser la cafetería preferida en la región, destacando por la calidad de nuestros productos 
-                    y el compromiso con la sostenibilidad y la comunidad.
-                </p>
-                <img src="../../Vista/Imagenes/img-nosotros/vision.jpg" alt="Imagen Visión" />
+                <p>Ser la cafetería preferida en la región, destacando por la calidad de nuestros productos y el compromiso con la sostenibilidad y la comunidad.</p>
+                <img th:src="@{/img/img-nosotros/vision.jpg}" alt="Imagen Visión" />
             </div>
         </div>
-        <br>
-        <br>
+        <br><br>
 
         <section class="about">
             <div class="about-image animate-left">
-                <img src="../../Vista/Imagenes/img-nosotros/repartir.jpg" alt="Imagen Lora Café" />
+                <img th:src="@{/img/img-nosotros/repartir.jpg}" alt="Imagen Lora Café" />
             </div>
             <div class="about-content animate-right">
                 <h2>Nuestras actividades</h2>
@@ -105,7 +75,7 @@
 
                    <br> Estas actividades se realizan con éxito gracias a nuestro GRAN EQUIPO LORA CAFÉ
                    <br>
-                   <a href="#promos-section" class="toggle-button">Ver Equipo</a>
+                   <a th:href="@{#promos-section}" class="toggle-button">Ver Equipo</a>
 
             
             </div>
@@ -116,131 +86,114 @@
             <h2>Nuestro Equipo 💪🏻</h2>
             <div class="promociones-grid">
               <div class="promocion">
-                <img src="../../Vista/Imagenes/img-nosotros/equi16.jpg" alt="Promoción 1">
+                <img th:src="@{/img/img-nosotros/equi16.jpg}" alt="Promoción 1">
                 
             
                 
               </div>
               <div class="promocion">
-                <img src="../../Vista/Imagenes/img-nosotros/equi2.jpg" alt="Promoción 2">
+                <img th:src="@{/img/img-nosotros/equi2.jpg}" alt="Promoción 2">
                 
               </div>
               <div class="promocion">
-                <img src="../../Vista/Imagenes/img-nosotros/equi3.jpg" alt="Promoción 3">
+                <img th:src="@{/img/img-nosotros/equi3.jpg}" alt="Promoción 3">
                
               </div>
               <div class="promocion">
-                <img src="../../Vista/Imagenes/img-nosotros/equi4.jpg" alt="Promoción 4">
+                <img th:src="@{/img/img-nosotros/equi4.jpg}" alt="Promoción 4">
                 
                
               </div>
               <div class="promocion">
-                <img src="../../Vista/Imagenes/img-nosotros/equi5.jpg" alt="Promoción 5">
+                <img th:src="@{/img/img-nosotros/equi5.jpg}" alt="Promoción 5">
                 
               </div>
               <div class="promocion">
-                <img src="../../Vista/Imagenes/img-nosotros/equi6.jpg" alt="Promoción 6">
+                <img th:src="@{/img/img-nosotros/equi6.jpg}" alt="Promoción 6">
                 
               </div>
               <div class="promocion">
-                <img src="../../Vista/Imagenes/img-nosotros/equi7.jpg" alt="Promoción 7">
+                <img th:src="@{/img/img-nosotros/equi7.jpg}" alt="Promoción 7">
                 
             
                 
               </div>
               <div class="promocion">
-                <img src="../../Vista/Imagenes/img-nosotros/equi8.jpg" alt="Promoción 8">
+                <img th:src="@{/img/img-nosotros/equi8.jpg}" alt="Promoción 8">
                 
               </div>
               <div class="promocion">
-                <img src="../../Vista/Imagenes/img-nosotros/equi9.jpg" alt="Promoción 9">
+                <img th:src="@{/img/img-nosotros/equi9.jpg}" alt="Promoción 9">
                
               </div>
               <div class="promocion">
-                <img src="../../Vista/Imagenes/img-nosotros/equi10.jpg" alt="Promoción 10">
+                <img th:src="@{/img/img-nosotros/equi10.jpg}" alt="Promoción 10">
                 
                
               </div>
               <div class="promocion">
-                <img src="../../Vista/Imagenes/img-nosotros/equi11.jpg" alt="Promoción 11">
+                <img th:src="@{/img/img-nosotros/equi11.jpg}" alt="Promoción 11">
                 
               </div>
               <div class="promocion">
-                <img src="../../Vista/Imagenes/img-nosotros/equi12.jpg" alt="Promoción 12">
+                <img th:src="@{/img/img-nosotros/equi12.jpg}" alt="Promoción 12">
                 
               </div>
             
             <div class="promocion">
-              <img src="../../Vista/Imagenes/img-nosotros/equi13.jpg" alt="Promoción 13">
+              <img th:src="@{/img/img-nosotros/equi13.jpg}" alt="Promoción 13">
               
              
             </div>
             <div class="promocion">
-              <img src="../../Vista/Imagenes/img-nosotros/equi14.jpg" alt="Promoción 14">
+              <img th:src="@{/img/img-nosotros/equi14.jpg}" alt="Promoción 14">
               
             </div>
             <div class="promocion">
-              <img src="../../Vista/Imagenes/img-nosotros/equi15.jpg" alt="Promoción 15">
+              <img th:src="@{/img/img-nosotros/equi15.jpg}" alt="Promoción 15">
             
             </div>
           </section>
 
 
+        <!-- ========= SECCIÓN DE CONTACTO INTELIGENTE ========= -->
         <div class="contactanos">
             <div class="titulo">
-                <h2>Contactanos</h2>
+                <h2>Contáctanos</h2>
             </div>
-            <div class="box">
 
-                <div class="contacto formulario">
-                    <h2><b>Comunicanos</b></h2>
-                    <form>
-                        <div class="formBox">
-                            <div class="row50">
-                                <div class="inputBox">
-                                    <span>Nombres:</span>
-                                    <input type="text" placeholder="Nombres" />
+            <!-- Muestra el formulario SÓLO si el usuario ha iniciado sesión -->
+            <div sec:authorize="isAuthenticated()">
+                <div class="box">
+                    <div class="contacto formulario">
+                        <h2><b>Comunícanos tu consulta</b></h2>
+                        <!-- Usamos el ID para que el JS lo encuentre -->
+                        <form id="contact-form"> 
+                            <div class="formBox">
+                                <div class="row100">
+                                    <div class="inputBox">
+                                        <!-- Mostramos el nombre del usuario logueado -->
+                                        <span>Enviando como: <strong sec:authentication="principal.username"></strong></span>
+                                        <span>Mensaje:</span>
+                                        <textarea placeholder="Escribe aquí tu mensaje..."></textarea>
+                                    </div>
                                 </div>
-                                <div class="inputBox">
-                                    <span>Apellidos:</span>
-                                    <input type="text" placeholder="Apellidos" />
+                                <div class="row100">
+                                    <div class="inputBox">
+                                        <input type="submit" value="Enviar Mensaje" />
+                                    </div>
                                 </div>
                             </div>
-
-                            <div class="row50">
-                                <div class="inputBox">
-                                    <span>Correo electrónico:</span>
-                                    <input type="text" placeholder="Correo electrónico" />
-                                </div>
-                                <div class="inputBox">
-                                    <span>Celular:</span>
-                                    <input type="text" placeholder="Celular" />
-                                </div>
-                            </div>
-
-                            <div class="row100">
-                                <div class="inputBox">
-                                    <span>Mensaje:</span>
-                                    <textarea placeholder="Mensaje..."></textarea>
-                                </div>
-                            </div>
-
-                            <div class="row100">
-                                <div class="inputBox">
-                                    <input type="submit" value="Enviar" />
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+                        </form>
+                    </div>
 
                 <div id="success-modal" class="modal">
-                    <div class="modal-content">
-                      <img src="../../Vista/Imagenes/img-nosotros/reloj.jpg" alt="" class="modal-image" />
-                      <p>¡Pronto estaremos dando respuesta!</p>
-                      <button id="close-modal">Cerrar</button>
-                    </div>
-                  </div>
+                <div class="modal-content">
+                    <img th:src="@{/img/img-nosotros/reloj.jpg}" alt="" class="modal-image" />
+                    <p>¡Mensaje enviado! Pronto te responderemos. Podrás ver la respuesta en "Mi Cuenta".</p>
+                    <button id="close-modal">Cerrar</button>
+                </div>
+            </div>
 
                 <div class="contacto informacion">
                     <h3>Informacion de contacto</h3>
@@ -281,32 +234,22 @@
                         style="border: 0" allowfullscreen="" loading="lazy"
                         referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
+
+                <!-- Muestra este mensaje SÓLO si el usuario es anónimo -->
+            <div sec:authorize="isAnonymous()" class="login-prompt">
+                <p>Para enviarnos un mensaje y ver nuestra respuesta en tu cuenta, por favor:</p>
+                <a th:href="@{/login}" class="btn-login-prompt">Inicia Sesión o Regístrate</a>
+            </div>
+
             </div>
         </div>
     </div>
 
-    <footer style="background-color: #5c5858; color: white; text-align: center; padding: 10px 0;">
-      <p>&copy; 2024 Lora Café. Todos los derechos reservados.</p>
-      <p>Síguenos en redes sociales: </p>
-      <a href="https://www.facebook.com/share/ctLabiRs8VnH2tCH/?mibextid=qi20mg" >
-      <ion-icon name="logo-facebook" style= "color: rgb(255, 255, 255); font-size: 24px; margin-right: 15px;"></ion-icon>
-      </a>
-      <a href="https://www.instagram.com/loracafe.ica?igsh=bGkwN3locXhpMWZw">
-      <ion-icon name="logo-instagram" style="color: rgb(255, 255, 255);font-size: 24px; margin-right: 15px;"></ion-icon>
-      </a>
-      <a href="https://l.instagram.com/?u=https%3A%2F%2Fwa.link%2Foomk5g&e=AT10FzF9cbchi_VQ_RF7ArFOdT0GMtS-p4ovBUU8RL1OLmGIzX-8jLJnzfEH_z3D9GC9MBHTIEbFcJWP8pqWQrphw4wdhbWM_XxHnw">
-          <ion-icon name="logo-whatsapp" style="color: rgb(255, 255, 255);font-size: 24px; margin-right: 15px;"></ion-icon>
-      </a>
-              
-  </footer>
+    <div th:replace="~{Cliente/fragments/footer :: footer}"></div>
+    
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script th:src="@{/assets/cliente/js/sobrenosotros.js}"></script>
+    <script th:src="@{/assets/cliente/js/Navbar.js}"></script>
 </body>
-
-</html>
-</div>
-<script src="../../Controlador/JavaScript/sobrenosotros.js"></script>
-<script src="../../Controlador/JavaScript/Navbar.js"></script>
-</body>
-
 </html>

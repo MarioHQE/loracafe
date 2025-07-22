@@ -462,7 +462,7 @@ body{
     color: #333;
     border: none;
     font-size: 1.1em;
-    max-width: 120px;
+    max-width: 200px;
     font-weight: 500;
     cursor: pointer;
     padding: 14px 15px;
@@ -523,6 +523,34 @@ body{
 .mapa iframe{
     width: 100%;
     height: 100%;
+}
+
+/* Estilos para el mensaje de "Iniciar Sesión" */
+.login-prompt {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: #fff9f2;
+    border: 1px dashed #e27107;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+.login-prompt p {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+.btn-login-prompt {
+    display: inline-block;
+    padding: 12px 30px;
+    background-color: #e27107;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+.btn-login-prompt:hover {
+    background-color: #c05d05;
 }
 @media (min-width: 768px) and (max-width: 1024px) {
 	.heading{
